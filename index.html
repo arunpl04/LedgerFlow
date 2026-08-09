@@ -52,6 +52,10 @@ body{font-family:'Trebuchet MS',Arial,sans-serif}
 .metric-label{font-size:10px;color:var(--text-sub);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
 .metric-value{font-size:18px;font-weight:700}
 .metric-sub{font-size:10px;color:var(--text-faint);margin-top:2px}
+.split-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:9px}
+.split-stat{background:var(--card-bg);border-radius:12px;padding:.875rem;box-shadow:0 2px 10px var(--shadow);border-left:4px solid #4FB0C6}
+.split-chk{width:21px;height:21px;accent-color:#1D9E75;cursor:pointer;flex-shrink:0}
+.pending-pill{display:inline-block;font-size:9.5px;font-weight:800;color:#BA7517;background:#FFF6E5;border-radius:5px;padding:2px 6px;letter-spacing:.03em;text-transform:uppercase}
 .acct-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:1.25rem}
 .acct-card{border-radius:12px;padding:.875rem;box-shadow:0 2px 10px var(--shadow);border:2px solid transparent;cursor:pointer;touch-action:manipulation}
 .acct-card:active{transform:scale(.97)}
@@ -111,6 +115,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
 .snapshot-banner{border-radius:12px;padding:.85rem 1.1rem;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .nw-banner{background:linear-gradient(135deg,rgba(127,119,221,.14),rgba(83,63,170,.08));border:1px solid rgba(127,119,221,.28)}
 .sts-banner{background:linear-gradient(135deg,rgba(29,158,117,.12),rgba(15,110,86,.07));border:1px solid rgba(29,158,117,.25)}
+.splits-banner{background:linear-gradient(135deg,rgba(79,176,198,.16),rgba(79,176,198,.06));border:1px solid rgba(79,176,198,.3)}
 
 /* ── MONTH NAV ── */
 .month-nav{display:flex;align-items:center;gap:8px;margin-bottom:1.1rem;flex-wrap:wrap}
@@ -137,13 +142,27 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
 .panel-overlay.open{display:block;opacity:1}
 .panel{position:fixed;top:0;right:-110%;width:min(460px,100vw);height:100dvh;background:var(--body-bg);z-index:200;transition:right .3s cubic-bezier(.4,0,.2,1),background .25s;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:-6px 0 30px rgba(0,0,0,.18)}
 .panel.open{right:0}
-.panel-hdr{background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:max(1.25rem,calc(env(safe-area-inset-top)+1rem)) 1.25rem 1.25rem;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:1}
+.panel-hdr{background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:max(2rem,calc(env(safe-area-inset-top)+1.65rem)) 1.25rem 1.25rem;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:1}
 .panel-hdr h2{font-size:16px;font-weight:700;color:#fff;text-align:center}
 .panel-close{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;touch-action:manipulation;-webkit-appearance:none;position:absolute;right:1.25rem;top:50%;transform:translateY(-50%)}
 .panel-body{padding:1.1rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom))}
 
 /* ── MODALS ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:300;padding:1rem}
+
+/* ── CELEBRATION ── */
+.celebrate-overlay{position:fixed;inset:0;background:rgba(10,20,16,.6);display:flex;align-items:center;justify-content:center;z-index:400;padding:1rem;animation:celFadeIn .2s ease}
+@keyframes celFadeIn{from{opacity:0}to{opacity:1}}
+.celebrate-card{background:var(--card-bg);border-radius:18px;padding:2rem 1.75rem 1.6rem;max-width:320px;width:100%;text-align:center;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:celPopIn .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes celPopIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.celebrate-emoji{font-size:52px;display:inline-block;animation:celBounce 1s ease infinite}
+@keyframes celBounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+.celebrate-title{font-size:18px;font-weight:700;color:var(--text-main);margin-top:10px}
+.celebrate-sub{font-size:12.5px;color:var(--text-sub);margin-top:6px;line-height:1.55}
+.celebrate-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti-piece{position:absolute;top:-12px;width:7px;height:13px;opacity:.9;animation-name:celConfetti;animation-timing-function:linear;animation-fill-mode:forwards}
+@keyframes celConfetti{to{transform:translateY(420px) rotate(560deg);opacity:0}}
+.celebrate-close{margin-top:18px;width:100%}
 .modal{background:var(--card-bg);border-radius:14px;padding:1.5rem;max-width:380px;width:100%;max-height:82dvh;overflow-y:auto}
 
 /* ── BACKUP ── */
@@ -221,7 +240,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
   <div class="header-title-row">
     <h1>🏦 Arun's Wealth Ledger</h1>
     <div class="header-btns">
-      <button class="hdr-btn" onclick="openPanel('alerts')" aria-label="Alerts">🔔<span id="badge" class="notif-badge" style="display:none">0</span></button>
+      <button class="hdr-btn" onclick="openPanel('alerts')" aria-label="Notifications">🔔<span id="badge" class="notif-badge" style="display:none">0</span></button>
       <button class="hdr-btn" onclick="openPanel('settings')" aria-label="Settings">⚙️</button>
       <button class="hdr-btn" onclick="openPanel('share')" aria-label="Share">📤</button>
     </div>
@@ -264,6 +283,13 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
   <div class="metric-grid" id="metrics"></div>
   <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Account Balances</div>
   <div class="acct-grid" id="account-cards"></div>
+  <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:6px">🤝 Split Balance</div>
+  <div class="split-stat-grid" id="dash-split-stats"></div>
+  <div class="card" id="dash-split-detail-card" style="display:none">
+    <h3>👥 Who Owes What</h3>
+    <p style="font-size:11px;color:var(--text-sub);margin-bottom:8px">From splits logged via the split toggle when adding an expense.</p>
+    <div id="dash-splits-by-person"></div>
+  </div>
   <div class="card"><h3>Income vs Expenses</h3><div style="position:relative;height:175px"><canvas id="barChart"></canvas></div></div>
   <div class="card"><h3>Spending by Category</h3><div style="position:relative;height:190px"><canvas id="pieChart"></canvas></div><div id="pie-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:11px"></div></div>
   <div class="card"><h3>Budget Progress</h3><div id="budget-progress"></div></div>
@@ -328,7 +354,11 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
     </div>
     <div id="goal-msg" style="margin-top:10px;font-size:12px;text-align:center;font-weight:600"></div>
   </div>
-  <div class="card"><h3>🎯 Your Savings Goals</h3><div id="goals-list"></div></div>
+  <div class="card">
+    <h3>🎯 These Are Your Goals</h3>
+    <div class="seg-group" id="goals-filter-bar" style="margin-bottom:12px"></div>
+    <div id="goals-list"></div>
+  </div>
 </div>
 
 <!-- INCOME -->
@@ -366,7 +396,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
   <div class="card">
     <h3>Add Expense</h3>
     <div class="form-row">
-      <div><label class="lbl">Amount</label><input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
+      <div><label class="lbl">Amount</label><input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal" oninput="syncExpSplitAmount()"></div>
       <div><label class="lbl">Currency</label><select id="exp-currency"><option value="CAD">CAD $</option><option value="USD">USD $</option><option value="INR">INR ₹</option></select></div>
     </div>
     <div class="form-row">
@@ -376,6 +406,22 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
     <div class="form-row">
       <div><label class="lbl">Date</label><input type="date" id="exp-date"></div>
       <div><label class="lbl">Note (optional)</label><input type="text" id="exp-note" placeholder="e.g. No Frills, Walmart"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1.5px solid var(--border-col);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+      <button class="toggle off" id="exp-split-toggle" onclick="toggleExpSplit()" style="flex-shrink:0"></button>
+      <span style="font-size:13px;font-weight:600;color:var(--text-main)">🤝 This is a split with a friend</span>
+    </div>
+    <div id="exp-split-fields" style="display:none;background:var(--input-bg);border:1.5px solid var(--border-col);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="margin-bottom:10px"><label class="lbl">Friend's Name</label><input type="text" id="exp-split-person" placeholder="e.g. Priya"></div>
+      <div style="margin-bottom:10px">
+        <label class="lbl">Direction</label>
+        <div class="seg-group" id="exp-split-dir-seg">
+          <button class="seg-btn seg-active" data-val="owe_me" onclick="setExpSplitDir('owe_me')">🤝 They owe me</button>
+          <button class="seg-btn" data-val="i_owe" onclick="setExpSplitDir('i_owe')">💸 I owe them</button>
+        </div>
+      </div>
+      <div id="exp-split-share-row"><label class="lbl">Their Share</label><input type="number" id="exp-split-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
+      <p id="exp-split-hint" style="font-size:10.5px;color:var(--text-faint);margin-top:8px;line-height:1.5"></p>
     </div>
     <div style="display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1.5px solid var(--border-col);border-radius:8px;padding:10px 12px;margin-bottom:10px">
       <button class="toggle off" id="exp-recur-toggle" onclick="toggleExpRecur()" style="flex-shrink:0"></button>
@@ -448,15 +494,15 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
 
 <!-- FOOTER -->
 <div class="app-footer">
-  Designed &amp; built by <strong style="color:#1D9E75">Arunachalam Palaniappan</strong><br>
-  <span style="font-size:10px;color:#bbb">Powered by AI · All rights reserved</span>
+  © 2026 <strong style="color:#1D9E75">Arunachalam Palaniappan</strong>. All Rights Reserved.<br>
+  <span style="font-size:10px;color:#bbb">Designed &amp; Developed by Arunachalam Palaniappan</span>
 </div>
 </div><!-- /wrap -->
 
 <!-- ALERTS PANEL -->
 <div class="panel-overlay" id="overlay-alerts" onclick="closePanel('alerts')"></div>
 <div class="panel" id="panel-alerts">
-  <div class="panel-hdr"><h2>🔔 Budget Alerts</h2><button class="panel-close" onclick="closePanel('alerts')">✕</button></div>
+  <div class="panel-hdr"><h2>🔔 Notifications</h2><button class="panel-close" onclick="closePanel('alerts')">✕</button></div>
   <div class="panel-body">
     <div class="card" style="margin-bottom:1rem">
       <h3>Notification Settings</h3>
@@ -510,6 +556,17 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
         <option value="USD">🇺🇸 USD $</option>
         <option value="INR">🇮🇳 INR ₹</option>
       </select>
+    </div>
+    <div class="card">
+      <h3>💳 Credit Card Limit</h3>
+      <p style="font-size:12px;color:var(--text-sub);margin-bottom:10px;line-height:1.6">Set your card's limit to see utilization on the Credit Card balance and get notified as you get close to it.</p>
+      <div class="form-row">
+        <div><label class="lbl">Credit Limit</label><input type="number" id="credit-limit-input" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
+        <div><label class="lbl">Currency</label><select id="credit-limit-currency" onchange="renderCreditLimitForm()"><option value="CAD">CAD $</option><option value="USD">USD $</option><option value="INR">INR ₹</option></select></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--list-border);margin-bottom:10px"><span style="font-size:13px;font-weight:600">🔔 Notify me nearing my limit</span><button class="toggle on" id="tog-creditAlertOn" onclick="toggleCreditAlert()"></button></div>
+      <button class="btn btn-primary" style="width:100%" onclick="saveCreditLimit()">✅ Save Credit Limit</button>
+      <div id="credit-limit-msg" style="margin-top:8px;font-size:12px;font-weight:600;text-align:center"></div>
     </div>
     <div class="card">
       <h3>⚡ Quick-Add Presets</h3>
@@ -612,9 +669,9 @@ const ACCTS=[
   {key:'creditCard',icon:'💳',label:'Credit Card',color:'#D85A30',bg:'#FFF5F1'},
   {key:'cash',      icon:'💵',label:'Cash',       color:'#EF9F27',bg:'#FFFBF0'}
 ];
-const PAY_L={chequing:'🏦 Chequing',savings:'💰 Savings',creditCard:'💳 Credit Card',cash:'💵 Cash'};
-const PAY_C={chequing:'#378ADD',savings:'#1D9E75',creditCard:'#D85A30',cash:'#EF9F27'};
-const PAY_BG={chequing:'#EFF6FF',savings:'#F0FFFE',creditCard:'#FFF5F1',cash:'#FFFBF0'};
+const PAY_L={chequing:'🏦 Chequing',savings:'💰 Savings',creditCard:'💳 Credit Card',cash:'💵 Cash',pending:'🤝 Split (unsettled)'};
+const PAY_C={chequing:'#378ADD',savings:'#1D9E75',creditCard:'#D85A30',cash:'#EF9F27',pending:'#4FB0C6'};
+const PAY_BG={chequing:'#EFF6FF',savings:'#F0FFFE',creditCard:'#FFF5F1',cash:'#FFFBF0',pending:'#EFFAFB'};
 const CAT_MIG={'🧴 Personal supplies':'🏠 Personal/Home Supplies','🏡 Home supplies':'🏠 Personal/Home Supplies','🍽️ Restaurant':'🍽️ Restaurant & Entertainment','🎉 Entertainment':'🍽️ Restaurant & Entertainment'};
 
 // ── STATE ─────────────────────────────────────────────────────────────────
@@ -627,13 +684,17 @@ let memTransfers=[];
 let memRecurring=[];
 let memGoals=[];
 let memPresets=[];
-let settings={over:true,warn:true,remain:true,theme:'system',displayCurrency:'CAD'};
+let memSplits=[];
+
+let settings={over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'};
 let editingBalKey=null, selectedPeriod=1;
 let readAlerts=new Set();
 let editingExpId=null, editingIncId=null;
 let editingGoalId=null, fundingGoalId=null;
+let goalFilter='all';
 let editingPresetId=null;
 let expRecurOn=false;
+let expSplitOn=false, expSplitDir='owe_me';
 
 // ── THEME ─────────────────────────────────────────────────────────────────
 function applyTheme(){
@@ -655,12 +716,13 @@ function setDisplayCurrency(c){
   const bc=document.getElementById('budget-currency');if(bc)bc.value=c;
   if(editingGoalId==null){const gc=document.getElementById('goal-currency');if(gc)gc.value=c;}
   const pc=document.getElementById('preset-currency');if(pc)pc.value=c;
-  renderDashboard();renderDataSummary();renderBudgetForm();renderGoalsList();
+  const clc=document.getElementById('credit-limit-currency');if(clc)clc.value=c;
+  renderDashboard();renderDataSummary();renderBudgetForm();renderGoalsList();renderCreditLimitForm();renderSplitsBanner();
   const el=document.getElementById('display-currency-sel');if(el)el.value=c;
 }
 
 // ── PANELS ────────────────────────────────────────────────────────────────
-function openPanel(n){document.getElementById('panel-'+n).classList.add('open');const ov=document.getElementById('overlay-'+n);ov.style.display='block';requestAnimationFrame(()=>ov.classList.add('open'));document.body.style.overflow='hidden';if(n==='alerts')renderAlerts();if(n==='share')renderSharePanel();if(n==='settings'){const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';applyTheme();renderPresetSettings();}}
+function openPanel(n){document.getElementById('panel-'+n).classList.add('open');const ov=document.getElementById('overlay-'+n);ov.style.display='block';requestAnimationFrame(()=>ov.classList.add('open'));document.body.style.overflow='hidden';if(n==='alerts')renderAlerts();if(n==='share')renderSharePanel();if(n==='settings'){const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';applyTheme();renderPresetSettings();renderCreditLimitForm();}}
 function closePanel(n){document.getElementById('panel-'+n).classList.remove('open');const ov=document.getElementById('overlay-'+n);ov.classList.remove('open');setTimeout(()=>{ov.style.display='none';document.body.style.overflow='';},260);}
 
 // ── DATE / CALENDAR ───────────────────────────────────────────────────────
@@ -718,7 +780,8 @@ async function saveAll(){
     ['aruns_transfers',JSON.stringify(memTransfers)],
     ['aruns_recurring',JSON.stringify(memRecurring)],
     ['aruns_goals',JSON.stringify(memGoals)],
-    ['aruns_presets',JSON.stringify(memPresets)]
+    ['aruns_presets',JSON.stringify(memPresets)],
+    ['aruns_splits',JSON.stringify(memSplits)]
   ];
   let ok=true;
   for(const[k,v] of tasks){try{await window.storage.set(k,v);}catch(_){ok=false;}}
@@ -726,7 +789,7 @@ async function saveAll(){
   setTimeout(()=>setSL('Auto-saving on'),ok?3000:4000);
   return ok;
 }
-async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('aruns_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('aruns_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('aruns_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('aruns_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('aruns_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('aruns_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('aruns_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('aruns_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('aruns_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('aruns_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('aruns_presets');memPresets=pr?JSON.parse(pr.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
+async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('aruns_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('aruns_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('aruns_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('aruns_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('aruns_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('aruns_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('aruns_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('aruns_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('aruns_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('aruns_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('aruns_presets');memPresets=pr?JSON.parse(pr.value):[];const sp=await window.storage.get('aruns_splits');memSplits=sp?JSON.parse(sp.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
 function eKey(){return 'e_'+viewYear+'_'+viewMonth}
 function iKey(){return 'i_'+viewYear+'_'+viewMonth}
 function getExp(){return memExp[eKey()]||[]}
@@ -753,10 +816,32 @@ function dispAmtConv(e){
 }
 
 // ── ACCOUNTS ──────────────────────────────────────────────────────────────
-function calcBalance(k){const s=memAccounts[k]||0;const eT=allExp().filter(e=>(e.payMethod||'cash')===k).reduce((a,e)=>a+toCAD(e.amount,e.currency),0);const iT=allInc().filter(i=>(i.receivedIn||'chequing')===k).reduce((a,i)=>a+toCAD(i.amount,i.currency),0);const tIn=memTransfers.filter(t=>t.to===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);const tOut=memTransfers.filter(t=>t.from===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);return s+iT-eT+tIn-tOut;}
-function renderAccountCards(){const html=ACCTS.map(a=>{const bal=calcBalance(a.key),start=memAccounts[a.key]||0;return `<div class="acct-card" style="background:${a.bg}" onclick="openBalModal('${a.key}')"><div style="font-size:9px;color:${a.color};font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">${a.icon} ${a.label}</div><div style="font-size:18px;font-weight:700;color:${bal<0?'#E24B4A':a.color}">${fmtCad(bal)}</div><div style="font-size:10px;color:#aaa;margin-top:2px">${fmtSecondary(bal)}</div><div style="font-size:10px;color:${a.color};opacity:.65;margin-top:5px">Start: ${fmtCad(start)}</div></div>`;}).join('');['account-cards','account-cards-transfers'].forEach(id=>{const g=document.getElementById(id);if(g)g.innerHTML=html;});}
+function calcBalance(k){const s=memAccounts[k]||0;const eT=allExp().filter(e=>(e.payMethod||'cash')===k).reduce((a,e)=>a+toCAD(e.amount,e.currency),0);const iT=allInc().filter(i=>!i.pending&&(i.receivedIn||'chequing')===k).reduce((a,i)=>a+toCAD(i.amount,i.currency),0);const tIn=memTransfers.filter(t=>t.to===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);const tOut=memTransfers.filter(t=>t.from===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);return s+iT-eT+tIn-tOut;}
+function creditUtilPct(){const limit=settings.creditLimit||0;if(!(limit>0))return null;const owed=Math.max(0,-calcBalance('creditCard'));return{owed,limit,pct:Math.round(owed/limit*100)};}
+function renderAccountCards(){const html=ACCTS.map(a=>{const bal=calcBalance(a.key),start=memAccounts[a.key]||0;let utilHtml='';if(a.key==='creditCard'){const u=creditUtilPct();if(u){const col=u.pct>=100?'#E24B4A':u.pct>=80?'#EF9F27':'#1D9E75';utilHtml=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)"><div style="display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:${col}"><span>${u.pct}% of limit</span><span>${fmtCad(u.owed)} / ${fmtCad(u.limit)}</span></div><div class="budget-bar-wrap" style="height:5px;margin-top:4px"><div class="budget-bar" style="width:${Math.min(100,u.pct)}%;background:${col}"></div></div></div>`;}}return `<div class="acct-card" style="background:${a.bg}" onclick="openBalModal('${a.key}')"><div style="font-size:9px;color:${a.color};font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">${a.icon} ${a.label}</div><div style="font-size:18px;font-weight:700;color:${bal<0?'#E24B4A':a.color}">${fmtCad(bal)}</div><div style="font-size:10px;color:#aaa;margin-top:2px">${fmtSecondary(bal)}</div><div style="font-size:10px;color:${a.color};opacity:.65;margin-top:5px">Start: ${fmtCad(start)}</div>${utilHtml}</div>`;}).join('');['account-cards','account-cards-transfers'].forEach(id=>{const g=document.getElementById(id);if(g)g.innerHTML=html;});}
 function openBalModal(k){editingBalKey=k;const a=ACCTS.find(x=>x.key===k);document.getElementById('bal-modal-title').textContent=a.icon+' '+a.label;const cur=settings.displayCurrency||'CAD';const stored=memAccounts[k]||0;const disp=fromCAD(stored,cur);document.getElementById('bal-input').value=stored?(cur==='INR'?Math.round(disp):+disp.toFixed(2)):'';const bc=document.getElementById('bal-currency');if(bc)bc.value=cur;document.getElementById('bal-modal').style.display='flex';setTimeout(()=>document.getElementById('bal-input').focus(),100);}
 function saveStartingBal(){const cur=document.getElementById('bal-currency')?.value||'CAD';const val=parseFloat(document.getElementById('bal-input').value)||0;memAccounts[editingBalKey]=toCAD(val,cur);saveAll();renderAccountCards();document.getElementById('bal-modal').style.display='none';}
+
+// ── CREDIT LIMIT ──────────────────────────────────────────────────────────
+function renderCreditLimitForm(){
+  const sel=document.getElementById('credit-limit-currency');if(!sel)return;
+  const cur=sel.value||settings.displayCurrency||'CAD';sel.value=cur;
+  const stored=settings.creditLimit||0;
+  const disp=stored>0?fromCAD(stored,cur):0;
+  const inp=document.getElementById('credit-limit-input');
+  if(inp)inp.value=disp>0?(cur==='INR'?Math.round(disp):+disp.toFixed(2)):'';
+  const tog=document.getElementById('tog-creditAlertOn');if(tog)tog.className='toggle '+(settings.creditAlertOn!==false?'on':'off');
+}
+function toggleCreditAlert(){settings.creditAlertOn=settings.creditAlertOn===false;saveAll();const tog=document.getElementById('tog-creditAlertOn');if(tog)tog.className='toggle '+(settings.creditAlertOn?'on':'off');updateBadge();}
+function saveCreditLimit(){
+  const cur=document.getElementById('credit-limit-currency')?.value||'CAD';
+  const val=parseFloat(document.getElementById('credit-limit-input').value)||0;
+  settings.creditLimit=toCAD(val,cur);
+  saveAll();
+  const msg=document.getElementById('credit-limit-msg');
+  if(msg){msg.style.color='#1D9E75';msg.textContent='✅ Credit limit saved!';setTimeout(()=>{if(msg)msg.textContent='';},2500);}
+  renderAccountCards();updateBadge();
+}
 
 // ── NAV ───────────────────────────────────────────────────────────────────
 function showTab(tab,el){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}if(tab==='dashboard')renderDashboard();if(tab==='transfers'){const tc=document.getElementById('trf-currency');if(tc)tc.value=settings.displayCurrency||'CAD';renderAccountCards();renderTransferList();}if(tab==='budget'){const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';renderBudgetForm();}if(tab==='income'){if(editingIncId==null){const ic=document.getElementById('inc-currency');if(ic)ic.value=settings.displayCurrency||'CAD';}renderIncomeList();}if(tab==='expenses'){if(editingExpId==null){const ec=document.getElementById('exp-currency');if(ec)ec.value=settings.displayCurrency||'CAD';}renderExpenseList();renderRecurringList();renderQuickAdd();}if(tab==='goals'){if(editingGoalId==null){const gc=document.getElementById('goal-currency');if(gc)gc.value=settings.displayCurrency||'CAD';}renderGoalsList();}if(tab==='backup')renderDataSummary();if(tab==='convert')doConvert();}
@@ -772,7 +857,7 @@ function renderDashboard(){
   const tb=document.getElementById('today-btn');if(tb)tb.style.display=isToday?'none':'inline-flex';
   document.getElementById('month-label').textContent=MONTHS[viewMonth]+' '+viewYear;
 
-  const exps=getExp(),inc=getInc();
+  const exps=getExp(),inc=getInc().filter(i=>!i.pending);
   const tE=exps.reduce((s,e)=>s+toCAD(e.amount,e.currency),0),tI=inc.reduce((s,e)=>s+toCAD(e.amount,e.currency),0);
   const net=tI-tE,tB=Object.values(memBudgets).reduce((a,b)=>a+b,0),pct=tB>0?Math.round(tE/tB*100):0;
   document.getElementById('metrics').innerHTML=`
@@ -780,8 +865,9 @@ function renderDashboard(){
     <div class="metric"><div class="metric-label">Spent</div><div class="metric-value" style="color:#D85A30">${fmtCad(tE)}</div><div class="metric-sub">${fmtSecondary(tE)}</div></div>
     <div class="metric"><div class="metric-label">Balance</div><div class="metric-value" style="color:${net>=0?'#1D9E75':'#E24B4A'}">${net<0?'-':''}${fmtCad(Math.abs(net))}</div><div class="metric-sub">${net>=0?'Saved':'Over'}</div></div>
     <div class="metric"><div class="metric-label">Budget</div><div class="metric-value" style="color:${pct>100?'#E24B4A':pct>90?'#EF9F27':'#1D9E75'}">${pct}%</div><div class="metric-sub">of ${fmtCad(tB)}</div></div>`;
+  maybeBudgetCelebration(tE,tB);
   renderNetWorth();renderSafeToSpend(tI,tB);
-  renderAccountCards();
+  renderAccountCards();renderSplitsBanner();
   if(window._bC)window._bC.destroy();
   window._bC=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:['Income','Expenses'],datasets:[{data:[+tI.toFixed(2),+tE.toFixed(2)],backgroundColor:['#1D9E75','#D85A30'],borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtCad(c.raw)}}},scales:{y:{ticks:{callback:v=>'CA$'+v,font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
   const eBC={};exps.forEach(e=>{const v=toCAD(e.amount,e.currency);eBC[e.cat]=(eBC[e.cat]||0)+v;});
@@ -807,7 +893,7 @@ function renderDashboard(){
     return `<div class="budget-row"><span class="budget-label">${c.name}</span><div class="budget-bar-wrap"><div class="budget-bar" style="width:${p}%;background:${col}"></div></div><span class="budget-pct" style="color:${col}">${p}%</span></div>`;
   }).join('');
 
-  const all=[...getInc().map(e=>({...e,_t:'i'})),...exps.map(e=>({...e,_t:'e'}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  const all=[...inc.map(e=>({...e,_t:'i'})),...exps.map(e=>({...e,_t:'e'}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
   const rl=document.getElementById('recent-list');
   if(!all.length){rl.innerHTML='<div class="empty">No activity yet</div>';return;}
   rl.innerHTML=all.map(e=>{const isI=e._t==='i';const k=isI?(e.receivedIn||'chequing'):(e.payMethod||'cash');return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#333;font-size:13px">${isI?e.source:e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[k]};color:${PAY_C[k]}">${PAY_L[k]}</span></span><span style="font-weight:700;color:${isI?'#1D9E75':'#D85A30'};white-space:nowrap">${isI?'+':'-'}${dispAmtConv(e)}</span></li>`;}).join('');
@@ -824,7 +910,7 @@ function renderNetWorth(){
 // ── SAFE-TO-SPEND ─────────────────────────────────────────────────────────
 function renderSafeToSpend(tI,tB){
   const el=document.getElementById('sts-banner');if(!el)return;
-  if(tI===undefined){tI=getInc().reduce((s,e)=>s+toCAD(e.amount,e.currency),0);}
+  if(tI===undefined){tI=getInc().filter(i=>!i.pending).reduce((s,e)=>s+toCAD(e.amount,e.currency),0);}
   if(tB===undefined){tB=Object.values(memBudgets).reduce((a,b)=>a+b,0);}
   const sts=tI-tB;
   el.innerHTML=`<div><div style="font-size:10px;font-weight:700;color:#1D9E75;text-transform:uppercase;letter-spacing:.05em">💡 Safe to Spend</div><div style="font-size:10px;color:var(--text-faint);margin-top:2px">Income minus budgeted bills, ${MONTHS[viewMonth]}</div></div><div style="font-size:21px;font-weight:700;color:${sts<0?'#E24B4A':'#0F6E56'}">${sts<0?'-':''}${fmtCad(Math.abs(sts))}</div>`;
@@ -836,9 +922,13 @@ async function addIncome(){
   if(!amt||amt<=0||!dt){msg.style.color='#E24B4A';msg.textContent='⚠️ Fill amount and date.';return;}
   const d=new Date(dt);
   if(editingIncId!=null){
-    for(const k in memInc){const idx=memInc[k].findIndex(e=>e.id===editingIncId);if(idx>-1){memInc[k].splice(idx,1);break;}}
+    let old=null;
+    for(const k in memInc){const idx=memInc[k].findIndex(e=>e.id===editingIncId);if(idx>-1){old=memInc[k][idx];memInc[k].splice(idx,1);break;}}
     viewYear=d.getFullYear();viewMonth=d.getMonth();
-    const arr=getInc();arr.push({amount:amt,currency:cur,source:src,receivedIn:recv,date:dt,note,id:editingIncId});
+    const arr=getInc();
+    const updated={amount:amt,currency:cur,source:src,receivedIn:(old&&old.pending)?'pending':recv,date:dt,note,id:editingIncId};
+    if(old&&old.splitLinked){updated.splitLinked=true;updated.splitPerson=old.splitPerson;updated.splitDir=old.splitDir;updated.splitSettled=old.splitSettled;updated.linkedExpenseId=old.linkedExpenseId;updated.pending=old.pending;}
+    arr.push(updated);
     await setInc(arr);
     cancelEditIncome();
     msg.style.color='#1D9E75';msg.textContent='✅ Income updated!';setTimeout(()=>msg.textContent='',2500);
@@ -859,12 +949,13 @@ function editIncome(id){
   document.getElementById('inc-amount').value=inc.amount;
   document.getElementById('inc-currency').value=inc.currency;
   document.getElementById('inc-source').value=inc.source;
-  document.getElementById('inc-recv').value=inc.receivedIn||'chequing';
+  document.getElementById('inc-recv').value=inc.pending?'cash':(inc.receivedIn||'chequing');
   document.getElementById('inc-date').value=inc.date;
   document.getElementById('inc-note').value=inc.note||'';
   document.getElementById('inc-submit-btn').textContent='💾 Update Income';
   document.getElementById('inc-cancel-btn').style.display='inline-flex';
-  document.getElementById('inc-msg').textContent='';
+  document.getElementById('inc-msg').style.color='#4FB0C6';
+  document.getElementById('inc-msg').textContent=inc.splitLinked?`🤝 Linked to a split with ${inc.splitPerson} — that link stays as-is when you save.`:'';
   document.getElementById('inc-amount').scrollIntoView({behavior:'smooth',block:'center'});
 }
 function cancelEditIncome(){
@@ -876,7 +967,7 @@ function cancelEditIncome(){
   document.getElementById('inc-cancel-btn').style.display='none';
 }
 async function removeIncome(id){if(editingIncId===id)cancelEditIncome();await setInc(getInc().filter(e=>e.id!==id));renderIncomeList();renderAccountCards();renderDashboard();}
-function renderIncomeList(){const inc=[...getInc()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('income-list');if(!inc.length){el.innerHTML='<div class="empty">No income recorded yet</div>';return;}el.innerHTML=inc.map(e=>`<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#333">${e.source}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[e.receivedIn||'chequing']};color:${PAY_C[e.receivedIn||'chequing']}">${PAY_L[e.receivedIn||'chequing']}</span></span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:#1D9E75">+${dispAmtConv(e)}</span><button class="btn-sm" onclick="editIncome(${e.id})" style="min-width:38px;min-height:38px">✏️</button><button class="btn-sm" onclick="removeIncome(${e.id})" style="min-width:38px;min-height:38px">🗑</button></span></li>`).join('');}
+function renderIncomeList(){const inc=[...getInc()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('income-list');if(!el)return;if(!inc.length){el.innerHTML='<div class="empty">No income recorded yet</div>';return;}el.innerHTML=inc.map(e=>{let split='';if(e.splitLinked){split=e.splitSettled?`<div style="font-weight:700;color:#1D9E75;font-size:11.5px;margin-top:3px">✅ Received from ${e.splitPerson}</div>`:`<div style="margin-top:3px"><span class="pending-pill">⏳ Pending</span> <span style="font-weight:700;color:#BA7517;font-size:11.5px">from ${e.splitPerson}</span></div>`;}const settleChk=(e.splitLinked&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('inc',${e.id})" title="Mark received">`:'';const amtCol=(e.splitLinked&&!e.splitSettled)?'#BA7517':'#1D9E75';return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#333">${e.source}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span>${e.splitLinked?'':`<span class="pay-badge" style="background:${PAY_BG[e.receivedIn||'chequing']};color:${PAY_C[e.receivedIn||'chequing']}">${PAY_L[e.receivedIn||'chequing']}</span>`}${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:${amtCol}">+${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editIncome(${e.id})" style="min-width:38px;min-height:38px">✏️</button><button class="btn-sm" onclick="removeIncome(${e.id})" style="min-width:38px;min-height:38px">🗑</button></span></li>`;}).join('');}
 
 // ── TRANSFERS ─────────────────────────────────────────────────────────────
 function addTransfer(){
@@ -909,6 +1000,37 @@ function toggleExpRecur(){
   const btn=document.getElementById('exp-recur-toggle');btn.className='toggle '+(expRecurOn?'on':'off');
   document.getElementById('exp-recur-freq-row').style.display=expRecurOn?'grid':'none';
 }
+function toggleExpSplit(){
+  expSplitOn=!expSplitOn;
+  const btn=document.getElementById('exp-split-toggle');btn.className='toggle '+(expSplitOn?'on':'off');
+  document.getElementById('exp-split-fields').style.display=expSplitOn?'block':'none';
+  if(expSplitOn){syncExpSplitAmount();updateExpSplitHint();}
+}
+function setExpSplitDir(d){
+  expSplitDir=d;
+  document.querySelectorAll('#exp-split-dir-seg .seg-btn').forEach(b=>b.classList.toggle('seg-active',b.dataset.val===d));
+  const row=document.getElementById('exp-split-share-row');if(row)row.style.display=d==='owe_me'?'block':'none';
+  updateExpSplitHint();
+}
+function updateExpSplitHint(){
+  const h=document.getElementById('exp-split-hint');if(!h)return;
+  h.textContent=expSplitDir==='owe_me'
+    ?'The full amount above is logged as your expense, and their share is added to your income this month to balance it out.'
+    :'The amount above is logged as your expense, tagged as owed to your friend — no separate entry needed.';
+}
+function syncExpSplitAmount(){
+  if(!expSplitOn||expSplitDir!=='owe_me')return;
+  const sa=document.getElementById('exp-split-amount');if(!sa||sa.value)return;
+  const amt=document.getElementById('exp-amount').value;if(amt)sa.value=amt;
+}
+function resetExpSplitFields(){
+  expSplitOn=false;
+  const t=document.getElementById('exp-split-toggle');if(t)t.className='toggle off';
+  const f=document.getElementById('exp-split-fields');if(f)f.style.display='none';
+  const p=document.getElementById('exp-split-person');if(p)p.value='';
+  const a=document.getElementById('exp-split-amount');if(a)a.value='';
+  setExpSplitDir('owe_me');
+}
 async function generateRecurringDue(){
   if(!memRecurring.length)return;
   const today=localDateStr();
@@ -935,6 +1057,40 @@ function renderRecurringList(){
   el.innerHTML=active.map(t=>`<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:var(--text-main)">${t.cat}</span><span style="font-size:10px;color:var(--text-faint)">${FREQ_LABEL[t.frequency]} · next: ${t.nextDate}${t.note?' · '+t.note:''}</span></span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:#D85A30">${dispAmtConv(t)}</span><button class="btn-sm" onclick="stopRecurring(${t.id})" style="min-height:38px;min-width:38px">⏸</button></span></li>`).join('');
 }
 async function stopRecurring(id){const t=memRecurring.find(x=>x.id===id);if(t)t.active=false;await saveAll();renderRecurringList();}
+
+// ── CELEBRATIONS ──────────────────────────────────────────────────────────
+const CELEBRATE_COLORS=['#1D9E75','#7F77DD','#EF9F27','#4FB0C6','#D85A30'];
+function showCelebration(emoji,title,sub){
+  document.querySelectorAll('.celebrate-overlay').forEach(o=>o.remove());
+  const overlay=document.createElement('div');
+  overlay.className='celebrate-overlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+  let confetti='';
+  for(let i=0;i<24;i++){
+    const left=(Math.random()*100).toFixed(1),delay=(Math.random()*.4).toFixed(2),dur=(1.5+Math.random()*1.1).toFixed(2),color=CELEBRATE_COLORS[i%CELEBRATE_COLORS.length],rot=Math.round(Math.random()*360);
+    confetti+=`<span class="confetti-piece" style="left:${left}%;background:${color};animation-delay:${delay}s;animation-duration:${dur}s;transform:rotate(${rot}deg)"></span>`;
+  }
+  overlay.innerHTML=`<div class="celebrate-card"><div class="celebrate-confetti">${confetti}</div><div class="celebrate-emoji">${emoji}</div><div class="celebrate-title">${title}</div><div class="celebrate-sub">${sub}</div><button class="btn btn-primary celebrate-close" onclick="this.closest('.celebrate-overlay').remove()">Nice! 🎉</button></div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>{if(document.body.contains(overlay))overlay.remove();},6000);
+}
+function isMonthCelebratable(y,m){
+  const d=new Date();
+  if(y<d.getFullYear()||(y===d.getFullYear()&&m<d.getMonth()))return true;
+  const lastDay=new Date(y,m+1,0).getDate();
+  return y===d.getFullYear()&&m===d.getMonth()&&d.getDate()===lastDay;
+}
+function maybeBudgetCelebration(tE,tB){
+  if(!tB||tE<=0||tE>tB)return;
+  if(!isMonthCelebratable(viewYear,viewMonth))return;
+  const key=viewYear+'-'+viewMonth;
+  settings.celebratedBudgetMonths=settings.celebratedBudgetMonths||[];
+  if(settings.celebratedBudgetMonths.includes(key))return;
+  settings.celebratedBudgetMonths.push(key);
+  saveAll();
+  const under=tB-tE;
+  showCelebration('🎯','Under Budget!',`You spent ${fmtCad(tE)} of your ${fmtCad(tB)} budget for ${MONTHS[viewMonth]} — ${fmtCad(under)} to spare. Great job staying on track!`);
+}
 
 // ── SAVINGS GOALS ─────────────────────────────────────────────────────────
 function daysUntil(dateStr){if(!dateStr)return null;const d=new Date(dateStr+'T00:00:00'),t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
@@ -999,15 +1155,39 @@ function saveGoalFund(){
   const cur=document.getElementById('goal-fund-currency').value;
   const val=parseFloat(document.getElementById('goal-fund-amount').value);
   if(!val||val<=0)return;
+  const wasDone=g.target>0&&(g.allocated||0)>=g.target;
   g.allocated=(g.allocated||0)+toCAD(val,cur);
+  const isDone=g.target>0&&g.allocated>=g.target;
   saveAll();
   document.getElementById('goal-fund-modal').style.display='none';
   renderGoalsList();
+  if(!wasDone&&isDone)showCelebration('🏆','Goal Achieved!',`You hit your "${g.name}" goal — ${fmtCad(g.target)} saved. Amazing work!`);
+}
+function goalStatus(g){
+  const done=g.target>0&&(g.allocated||0)>=g.target;
+  if(done)return 'achieved';
+  const du=daysUntil(g.targetDate);
+  if(du!==null&&du<0)return 'overdue';
+  return 'progress';
+}
+function setGoalFilter(f){
+  goalFilter=f;
+  renderGoalsList();
+}
+function renderGoalsFilterBar(){
+  const bar=document.getElementById('goals-filter-bar');if(!bar)return;
+  const counts={all:memGoals.length,progress:0,achieved:0,overdue:0};
+  memGoals.forEach(g=>{counts[goalStatus(g)]++;});
+  const defs=[['all','All',''],['progress','In Progress','🌱'],['achieved','Achieved','🏆'],['overdue','Overdue','⚠️']];
+  bar.innerHTML=defs.map(([key,label,icon])=>`<button class="seg-btn${goalFilter===key?' seg-active':''}" data-val="${key}" onclick="setGoalFilter('${key}')">${icon?icon+' ':''}${label} (${counts[key]})</button>`).join('');
 }
 function renderGoalsList(){
+  renderGoalsFilterBar();
   const el=document.getElementById('goals-list');if(!el)return;
   if(!memGoals.length){el.innerHTML='<div class="empty">No savings goals yet — create one above 🏆</div>';return;}
-  const sorted=[...memGoals].sort((a,b)=>(a.targetDate||'9999-12-31').localeCompare(b.targetDate||'9999-12-31'));
+  const filtered=goalFilter==='all'?memGoals:memGoals.filter(g=>goalStatus(g)===goalFilter);
+  if(!filtered.length){el.innerHTML='<div class="empty">No goals in this view</div>';return;}
+  const sorted=[...filtered].sort((a,b)=>(a.targetDate||'9999-12-31').localeCompare(b.targetDate||'9999-12-31'));
   el.innerHTML=sorted.map(g=>{
     const pct=g.target>0?Math.min(100,Math.round((g.allocated||0)/g.target*100)):0;
     const remain=Math.max(0,g.target-(g.allocated||0));
@@ -1029,6 +1209,58 @@ function renderGoalsList(){
   }).join('');
 }
 
+// ── SPLITS / IOUs ─────────────────────────────────────────────────────────
+// Splits now live directly on the expense/income entry that created them (via the
+// "split with a friend" toggle in Add Expense). memSplits only holds legacy entries
+// from the old standalone Split Bills form, kept around so nothing gets lost.
+function getOpenSplits(){
+  const items=[];
+  memSplits.filter(s=>!s.settled).forEach(s=>items.push({uid:'L'+s.id,kind:'legacy',refId:s.id,person:s.person,direction:s.direction,amount:s.amount,currency:s.currency,date:s.date,note:s.note}));
+  allExp().forEach(e=>{if(e.splitDir==='i_owe'&&e.splitPerson&&!e.splitSettled)items.push({uid:'E'+e.id,kind:'exp',refId:e.id,person:e.splitPerson,direction:'i_owe',amount:e.amount,currency:e.currency,date:e.date,note:e.note||e.cat});});
+  allInc().forEach(e=>{if(e.splitLinked&&!e.splitSettled)items.push({uid:'I'+e.id,kind:'inc',refId:e.id,person:e.splitPerson,direction:'owe_me',amount:e.amount,currency:e.currency,date:e.date,note:e.note});});
+  return items;
+}
+function splitsNetCAD(){
+  const items=getOpenSplits();
+  const owedToMe=items.filter(s=>s.direction==='owe_me').reduce((a,s)=>a+toCAD(s.amount,s.currency),0);
+  const iOwe=items.filter(s=>s.direction==='i_owe').reduce((a,s)=>a+toCAD(s.amount,s.currency),0);
+  return{owedToMe,iOwe,net:owedToMe-iOwe};
+}
+function settleSplitItem(kind,refId){
+  if(kind==='legacy'){const s=memSplits.find(x=>x.id===refId);if(s){s.settled=true;s.settledDate=localDateStr();}}
+  else if(kind==='exp'){for(const k in memExp){const e=memExp[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.payMethod='cash';break;}}}
+  else if(kind==='inc'){for(const k in memInc){const e=memInc[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.pending=false;e.receivedIn='cash';break;}}}
+  saveAll();renderDashboard();renderExpenseList();renderIncomeList();renderAlerts();
+}
+function removeSplit(id){
+  if(!confirm('Delete this legacy split? This cannot be undone.'))return;
+  memSplits=memSplits.filter(s=>s.id!==id);saveAll();renderSplitsBanner();
+}
+function renderSplitsBanner(){
+  const{owedToMe,iOwe}=splitsNetCAD();
+  const grid=document.getElementById('dash-split-stats');
+  if(grid)grid.innerHTML=`
+    <div class="split-stat" style="border-left-color:#D85A30"><div class="metric-label">💸 You Owe</div><div class="metric-value" style="color:#D85A30">${fmtCad(iOwe)}</div><div class="metric-sub">${fmtSecondary(iOwe)}</div></div>
+    <div class="split-stat" style="border-left-color:#1D9E75"><div class="metric-label">🤝 Owed to You</div><div class="metric-value" style="color:#1D9E75">${fmtCad(owedToMe)}</div><div class="metric-sub">${fmtSecondary(owedToMe)}</div></div>`;
+  renderSplitsByPerson();
+}
+function renderSplitsByPerson(){
+  const el=document.getElementById('dash-splits-by-person');const card=document.getElementById('dash-split-detail-card');
+  if(!el||!card)return;
+  const items=getOpenSplits();
+  if(!items.length){card.style.display='none';el.innerHTML='';return;}
+  card.style.display='block';
+  const sorted=[...items].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const itemsHtml=sorted.map(s=>{
+    const owe=s.direction==='owe_me';
+    const col=owe?'#1D9E75':'#D85A30';
+    const lbl=owe?`${s.person} owes you`:`You owe ${s.person}`;
+    const delBtn=s.kind==='legacy'?`<button class="btn-sm" onclick="removeSplit(${s.refId})" style="min-width:36px;min-height:36px">🗑</button>`:'';
+    return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:var(--text-main);font-size:13px">${lbl}</span><span style="font-size:10px;color:var(--text-faint)">${s.note||''} · ${fmtDate(s.date)}</span></span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:${col};font-size:13px">${dispAmtConv(s)}</span><input type="checkbox" class="split-chk" onclick="settleSplitItem('${s.kind}',${s.refId})" title="Mark settled">${delBtn}</span></li>`;
+  }).join('');
+  el.innerHTML=`<ul style="list-style:none">${itemsHtml}</ul>`;
+}
+
 // ── EXPENSES ──────────────────────────────────────────────────────────────
 async function addExpense(){
   const amt=parseFloat(document.getElementById('exp-amount').value),cur=document.getElementById('exp-currency').value,cat=document.getElementById('exp-cat').value,dt=document.getElementById('exp-date').value,note=document.getElementById('exp-note').value.trim(),pay=document.getElementById('exp-pay').value,msg=document.getElementById('exp-msg');
@@ -1036,49 +1268,80 @@ async function addExpense(){
   const d=new Date(dt);
   if(editingExpId!=null){
     // Remove the old record from whichever month it currently lives in
-    for(const k in memExp){const idx=memExp[k].findIndex(e=>e.id===editingExpId);if(idx>-1){memExp[k].splice(idx,1);break;}}
+    let old=null;
+    for(const k in memExp){const idx=memExp[k].findIndex(e=>e.id===editingExpId);if(idx>-1){old=memExp[k][idx];memExp[k].splice(idx,1);break;}}
     viewYear=d.getFullYear();viewMonth=d.getMonth();
-    const arr=getExp();arr.push({amount:amt,currency:cur,cat,date:dt,note,payMethod:pay,id:editingExpId});
+    const arr=getExp();
+    const updated={amount:amt,currency:cur,cat,date:dt,note,payMethod:(old&&old.splitDir==='i_owe')?'pending':pay,id:editingExpId};
+    if(old&&old.splitPerson){updated.splitPerson=old.splitPerson;updated.splitDir=old.splitDir;if('splitSettled' in old)updated.splitSettled=old.splitSettled;}
+    arr.push(updated);
     await setExp(arr);
     cancelEditExpense();
     msg.style.color='#1D9E75';msg.textContent='✅ Expense updated!';setTimeout(()=>msg.textContent='',3000);
-    renderExpenseList();renderAccountCards();renderDashboard();updateBadge();
+    renderExpenseList();renderIncomeList();renderAccountCards();renderDashboard();updateBadge();renderSplitsBanner();
     return;
   }
+  let splitPerson='',splitAmt=0;
+  if(expSplitOn){
+    splitPerson=document.getElementById('exp-split-person').value.trim();
+    if(!splitPerson){msg.style.color='#E24B4A';msg.textContent="⚠️ Enter your friend's name.";return;}
+    if(expSplitDir==='owe_me'){
+      splitAmt=parseFloat(document.getElementById('exp-split-amount').value);
+      if(!splitAmt||splitAmt<=0){msg.style.color='#E24B4A';msg.textContent="⚠️ Enter their share so it can be logged as income.";return;}
+    }
+  }
   viewYear=d.getFullYear();viewMonth=d.getMonth();
-  const id=Date.now(),exps=getExp(),entry={amount:amt,currency:cur,cat,date:dt,note,payMethod:pay,id};
+  // "pending" is not a real account — using it for payMethod/receivedIn keeps split entries out of
+  // account-balance math (no cash has actually moved yet) while still counting toward monthly totals.
+  const id=Date.now(),exps=getExp();
+  const entry={amount:amt,currency:cur,cat,date:dt,note,payMethod:(expSplitOn&&expSplitDir==='i_owe')?'pending':pay,id};
+  if(expSplitOn){entry.splitPerson=splitPerson;entry.splitDir=expSplitDir;if(expSplitDir==='i_owe')entry.splitSettled=false;}
   if(expRecurOn){
     const freq=document.getElementById('exp-recur-freq').value;
     entry.recurringId=id;
     memRecurring.push({id,amount:amt,currency:cur,cat,payMethod:pay,note,frequency:freq,nextDate:nextRecurDate(dt,freq),active:true});
   }
+  let incArr=null,incEntry=null;
+  if(expSplitOn&&expSplitDir==='owe_me'){
+    incArr=getInc();
+    // Pending receivable: shows in the Income tab as "Pending" but is EXCLUDED from all
+    // income totals/balances until explicitly marked Received via its checkbox.
+    incEntry={amount:splitAmt,currency:cur,source:`🤝 Owed by ${splitPerson}`,receivedIn:'pending',date:dt,note:note||cat,id:id+1,splitLinked:true,splitPerson,splitDir:'owe_me',linkedExpenseId:id,splitSettled:false,pending:true};
+    incArr.push(incEntry);
+  }
   exps.push(entry);
-  const ok=await setExp(exps);
-  if(!ok){exps.pop();if(expRecurOn)memRecurring.pop();msg.style.color='#E24B4A';msg.textContent='⚠️ Could not save. Please try again.';setTimeout(()=>msg.textContent='',6000);return;}
+  let ok=await setExp(exps);
+  if(ok&&incEntry)ok=await setInc(incArr);
+  if(!ok){exps.pop();if(expRecurOn)memRecurring.pop();if(incEntry)incArr.pop();msg.style.color='#E24B4A';msg.textContent='⚠️ Could not save. Please try again.';setTimeout(()=>msg.textContent='',6000);return;}
   document.getElementById('exp-amount').value='';document.getElementById('exp-note').value='';
   document.getElementById('exp-currency').value=settings.displayCurrency||'CAD';
   const wasRecur=expRecurOn;
   if(expRecurOn){expRecurOn=false;document.getElementById('exp-recur-toggle').className='toggle off';document.getElementById('exp-recur-freq-row').style.display='none';}
+  const wasSplit=expSplitOn,wasSplitDir=expSplitDir;
+  if(expSplitOn)resetExpSplitFields();
   const spent=getExp().filter(e=>e.cat===cat).reduce((s,e)=>s+toCAD(e.amount,e.currency),0),limit=memBudgets[cat]||0;
   if(limit&&spent>limit){const ov=+((spent-limit)/limit*100).toFixed(1);msg.style.color='#E24B4A';msg.textContent=`⚠️ ${cat} is ${ov}% over budget!`;}
   else if(limit&&spent/limit>=0.8){msg.style.color='#BA7517';msg.textContent=`⚠️ ${cat} at ${Math.round(spent/limit*100)}% of budget`;}
+  else if(wasSplit){msg.style.color='#1D9E75';msg.textContent=wasSplitDir==='owe_me'?`✅ Expense added — ${splitPerson} now owes you ${fmtCad(toCAD(splitAmt,cur))} (pending until received).`:`✅ Expense added — you owe ${splitPerson} for this one.`;}
   else{msg.style.color='#1D9E75';msg.textContent=wasRecur?'✅ Added — future occurrences will be added automatically!':'✅ Expense added — balances updated!';}
   setTimeout(()=>msg.textContent='',3500);
-  renderExpenseList();renderAccountCards();renderRecurringList();updateBadge();
+  renderExpenseList();renderIncomeList();renderAccountCards();renderRecurringList();updateBadge();renderSplitsBanner();
 }
 function editExpense(id){
   const exp=allExp().find(e=>e.id===id);if(!exp)return;
   editingExpId=id;
   expRecurOn=false;document.getElementById('exp-recur-toggle').className='toggle off';document.getElementById('exp-recur-freq-row').style.display='none';
+  resetExpSplitFields();
   document.getElementById('exp-amount').value=exp.amount;
   document.getElementById('exp-currency').value=exp.currency;
   document.getElementById('exp-cat').value=exp.cat;
-  document.getElementById('exp-pay').value=exp.payMethod||'cash';
+  document.getElementById('exp-pay').value=exp.splitDir==='i_owe'?'cash':(exp.payMethod||'cash');
   document.getElementById('exp-date').value=exp.date;
   document.getElementById('exp-note').value=exp.note||'';
   document.getElementById('exp-submit-btn').textContent='💾 Update Expense';
   document.getElementById('exp-cancel-btn').style.display='inline-flex';
-  document.getElementById('exp-msg').textContent='';
+  document.getElementById('exp-msg').style.color='#4FB0C6';
+  document.getElementById('exp-msg').textContent=exp.splitPerson?`🤝 Linked to a split with ${exp.splitPerson} — that link stays as-is when you save.`:'';
   document.getElementById('exp-amount').scrollIntoView({behavior:'smooth',block:'center'});
 }
 function cancelEditExpense(){
@@ -1090,7 +1353,7 @@ function cancelEditExpense(){
   document.getElementById('exp-cancel-btn').style.display='none';
 }
 async function removeExpense(id){if(editingExpId===id)cancelEditExpense();await setExp(getExp().filter(e=>e.id!==id));renderExpenseList();renderAccountCards();renderDashboard();}
-function renderExpenseList(){const exps=[...getExp()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('all-list');if(!exps.length){el.innerHTML='<div class="empty">No expenses recorded yet</div>';return;}el.innerHTML=exps.map(e=>{const pm=e.payMethod||'cash';return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#333">${e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[pm]};color:${PAY_C[pm]};width:fit-content">${PAY_L[pm]}</span></span><span style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span style="font-weight:700;color:#D85A30">-${dispAmtConv(e)}</span><button class="btn-sm" onclick="editExpense(${e.id})" style="min-height:38px;min-width:38px">✏️</button><button class="btn-sm" onclick="removeExpense(${e.id})" style="min-height:38px;min-width:38px">🗑</button></span></li>`;}).join('');}
+function renderExpenseList(){const exps=[...getExp()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('all-list');if(!exps.length){el.innerHTML='<div class="empty">No expenses recorded yet</div>';return;}el.innerHTML=exps.map(e=>{const pm=e.payMethod||'cash';let split='';if(e.splitDir==='i_owe'){split=e.splitSettled?`<div style="font-weight:700;color:#1D9E75;font-size:11.5px;margin-top:3px">✅ Repaid ${e.splitPerson}</div>`:`<div style="font-weight:800;color:#D85A30;font-size:12.5px;margin-top:3px">You owe ${e.splitPerson} ${fmtCad(toCAD(e.amount,e.currency))}</div>`;}const settleChk=(e.splitDir==='i_owe'&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('exp',${e.id})" title="Mark repaid">`:'';return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#333">${e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[pm]};color:${PAY_C[pm]};width:fit-content">${PAY_L[pm]}</span>${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:#D85A30">-${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editExpense(${e.id})" style="min-height:38px;min-width:38px">✏️</button><button class="btn-sm" onclick="removeExpense(${e.id})" style="min-height:38px;min-width:38px">🗑</button></span></li>`;}).join('');}
 
 // ── QUICK-ADD PRESETS ────────────────────────────────────────────────────
 function renderQuickAdd(){
@@ -1162,19 +1425,34 @@ function cancelEditPreset(){
 function removePreset(id){if(editingPresetId===id)cancelEditPreset();memPresets=memPresets.filter(p=>p.id!==id);saveAll();renderPresetSettings();renderQuickAdd();}
 
 // ── ALERTS ────────────────────────────────────────────────────────────────
-function computeAlerts(){const eBC={};getExp().forEach(e=>{const v=toCAD(e.amount,e.currency);eBC[e.cat]=(eBC[e.cat]||0)+v;});const alerts=[];CATS.forEach(c=>{const s=eBC[c.name]||0,l=memBudgets[c.name]||0;if(!l)return;const p=s/l*100,r=l-s;if(settings.over&&s>l){const op=+((s-l)/l*100).toFixed(1);alerts.push({type:'over',cat:c.name,s,l,over:s-l,overPct:op});}else if(settings.warn&&p>=80)alerts.push({type:'warn',cat:c.name,s,l,p:Math.round(p),r});else if(settings.remain&&s>0)alerts.push({type:'ok',cat:c.name,s,l,r,p:Math.round(p)});});return alerts;}
-function alertKey(a){return viewYear+'_'+viewMonth+'_'+a.type+'_'+a.cat;}
+function computeCreditAlert(){
+  if(settings.creditAlertOn===false)return null;
+  const u=creditUtilPct();if(!u)return null;
+  if(u.pct>=100)return{type:'credit-over',owed:u.owed,limit:u.limit,overPct:+((u.owed-u.limit)/u.limit*100).toFixed(1)};
+  if(u.pct>=80)return{type:'credit-warn',owed:u.owed,limit:u.limit,p:u.pct,r:u.limit-u.owed};
+  return null;
+}
+function computeAlerts(){const eBC={};getExp().forEach(e=>{const v=toCAD(e.amount,e.currency);eBC[e.cat]=(eBC[e.cat]||0)+v;});const alerts=[];const ca=computeCreditAlert();if(ca)alerts.push(ca);CATS.forEach(c=>{const s=eBC[c.name]||0,l=memBudgets[c.name]||0;if(!l)return;const p=s/l*100,r=l-s;if(settings.over&&s>l){const op=+((s-l)/l*100).toFixed(1);alerts.push({type:'over',cat:c.name,s,l,over:s-l,overPct:op});}else if(settings.warn&&p>=80)alerts.push({type:'warn',cat:c.name,s,l,p:Math.round(p),r});else if(settings.remain&&s>0)alerts.push({type:'ok',cat:c.name,s,l,r,p:Math.round(p)});});return alerts;}
+function alertKey(a){if(a.type==='credit-over'||a.type==='credit-warn')return 'credit_'+a.type;return viewYear+'_'+viewMonth+'_'+a.type+'_'+a.cat;}
 function markAlertRead(key){readAlerts.add(key);saveAll();renderAlerts();}
 function markAllAlertsRead(){computeAlerts().forEach(a=>readAlerts.add(alertKey(a)));saveAll();renderAlerts();}
-function updateBadge(){const n=computeAlerts().filter(a=>(a.type==='over'||a.type==='warn')&&!readAlerts.has(alertKey(a))).length;const b=document.getElementById('badge');if(n>0){b.style.display='inline-flex';b.textContent=n;}else b.style.display='none';}
+function computeDebtAlerts(){
+  return allExp().filter(e=>e.splitDir==='i_owe'&&e.splitPerson&&!e.splitSettled)
+    .map(e=>({id:e.id,person:e.splitPerson,amount:e.amount,currency:e.currency,date:e.date}))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+function updateBadge(){const n=computeAlerts().filter(a=>['over','warn','credit-over','credit-warn'].includes(a.type)&&!readAlerts.has(alertKey(a))).length+computeDebtAlerts().length;const b=document.getElementById('badge');if(n>0){b.style.display='inline-flex';b.textContent=n;}else b.style.display='none';}
 function renderAlerts(){
-  const alerts=computeAlerts(),el=document.getElementById('alerts-list');
-  if(!alerts.length){el.innerHTML='<div class="empty">🎉 All budgets on track!</div>';updateBadge();return;}
+  const alerts=computeAlerts(),debts=computeDebtAlerts(),el=document.getElementById('alerts-list');
+  const debtHtml=debts.length?`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:#D85A30;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">🤝 Money You Owe</div>${debts.map(d=>`<div class="alert-item alert-over" style="align-items:center"><div style="flex:1"><div style="font-weight:800;color:#A32D2D">You need to repay ${d.person} ${fmtCad(toCAD(d.amount,d.currency))}</div><div style="color:#993C1D;margin-top:3px;font-size:12px">Since ${fmtDate(d.date)}</div></div><label style="display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;font-size:11px;font-weight:700;color:#A32D2D"><input type="checkbox" class="split-chk" onclick="settleSplitItem('exp',${d.id})">Repaid</label></div>`).join('')}</div>`:'';
+  if(!alerts.length){el.innerHTML=debtHtml+(debts.length?'':'<div class="empty">🎉 All clear — budgets and credit usage look good!</div>');updateBadge();return;}
   const anyUnread=alerts.some(a=>!readAlerts.has(alertKey(a)));
   const markAllBtn=anyUnread?`<button class="btn-sm" onclick="markAllAlertsRead()" style="width:100%;margin-bottom:10px;border-color:#1D9E75;color:#1D9E75">✓ Mark all as read</button>`:'';
-  el.innerHTML=markAllBtn+alerts.map(a=>{
+  el.innerHTML=debtHtml+markAllBtn+alerts.map(a=>{
     const key=alertKey(a),isRead=readAlerts.has(key);
     const readBtn=isRead?'':`<button class="btn-sm" onclick="markAlertRead('${key}')" style="flex-shrink:0">✓ Mark read</button>`;
+    if(a.type==='credit-over')return `<div class="alert-item alert-over" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#A32D2D">💳 Credit Card — ${a.overPct}% over your limit!</div><div style="color:#993C1D;margin-top:3px;font-size:12px">Owed ${fmtCad(a.owed)} · Limit ${fmtCad(a.limit)}</div></div>${readBtn}</div>`;
+    if(a.type==='credit-warn')return `<div class="alert-item alert-warn" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#854F0B">💳 Credit Card — ${a.p}% of your limit used</div><div style="color:#854F0B;margin-top:3px;font-size:12px">${fmtCad(a.r)} of credit remaining</div></div>${readBtn}</div>`;
     if(a.type==='over')return `<div class="alert-item alert-over" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#A32D2D">⛔ ${a.cat} — ${a.overPct}% over budget!</div><div style="color:#993C1D;margin-top:3px;font-size:12px">Spent ${fmtCad(a.s)} · Budget ${fmtCad(a.l)} · ${fmtCad(a.over)} over</div></div>${readBtn}</div>`;
     if(a.type==='warn')return `<div class="alert-item alert-warn" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#854F0B">⚠️ ${a.cat} — ${a.p}% used</div><div style="color:#854F0B;margin-top:3px;font-size:12px">${fmtCad(a.r)} remaining</div></div>${readBtn}</div>`;
     return `<div class="alert-item alert-ok" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#0F6E56">✅ ${a.cat} — ${a.p}% used</div><div style="color:#0F6E56;margin-top:3px;font-size:12px">${fmtCad(a.r)} remaining</div></div>${readBtn}</div>`;
@@ -1185,14 +1463,14 @@ function toggleSetting(k){settings[k]=!settings[k];saveAll();document.getElement
 
 // ── SHARE PANEL ───────────────────────────────────────────────────────────
 function getPDef(p){const ld=new Date(viewYear,viewMonth+1,0).getDate();if(p===1)return{label:`1–15 ${MONTHS[viewMonth]} ${viewYear}`,title:'First Half',dates:`1st–15th ${MONTHS[viewMonth]}`,f:(e)=>{const d=new Date(e.date);return d.getFullYear()===viewYear&&d.getMonth()===viewMonth&&d.getDate()<=15;}};if(p===2)return{label:`16–${ld} ${MONTHS[viewMonth]} ${viewYear}`,title:'Second Half',dates:`16th–${ld}th ${MONTHS[viewMonth]}`,f:(e)=>{const d=new Date(e.date);return d.getFullYear()===viewYear&&d.getMonth()===viewMonth&&d.getDate()>=16;}};if(p===3)return{label:`${MONTHS[viewMonth]} ${viewYear} — Full Month`,title:'Full Month',dates:`All of ${MONTHS[viewMonth]} ${viewYear}`,f:(e)=>{const d=new Date(e.date);return d.getFullYear()===viewYear&&d.getMonth()===viewMonth;}};return{label:'All Months — Complete History',title:'All Months',dates:'Everything entered so far',f:()=>true};}
-function renderSharePanel(){document.getElementById('period-cards-panel').innerHTML=[1,2,3,4].map(p=>{const def=getPDef(p),fE=allExp().filter(def.f),fI=allInc().filter(def.f);const tE=fE.reduce((s,e)=>s+toCAD(e.amount,e.currency),0),tI=fI.reduce((s,e)=>s+toCAD(e.amount,e.currency),0);const iS=selectedPeriod===p;return `<div class="period-card ${iS?'active-period':''}" onclick="selectPeriod(${p})"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div><div style="font-size:14px;font-weight:700;color:#333">Period ${p} — ${def.title}</div><div style="font-size:12px;color:#1D9E75;font-weight:600;margin-top:3px">${def.dates}</div></div>${iS?`<span style="font-size:10px;background:#1D9E75;color:#fff;padding:3px 9px;border-radius:6px;font-weight:700">✓</span>`:''}</div><div style="font-size:12px;color:#666;margin-top:5px">Income: <strong style="color:#1D9E75">${fmtCad(tI)}</strong> · Spent: <strong style="color:#D85A30">${fmtCad(tE)}</strong> · ${fE.length} expense${fE.length!==1?'s':''}</div></div>`;}).join('');}
+function renderSharePanel(){document.getElementById('period-cards-panel').innerHTML=[1,2,3,4].map(p=>{const def=getPDef(p),fE=allExp().filter(def.f),fI=allInc().filter(def.f).filter(i=>!i.pending);const tE=fE.reduce((s,e)=>s+toCAD(e.amount,e.currency),0),tI=fI.reduce((s,e)=>s+toCAD(e.amount,e.currency),0);const iS=selectedPeriod===p;return `<div class="period-card ${iS?'active-period':''}" onclick="selectPeriod(${p})"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div><div style="font-size:14px;font-weight:700;color:#333">Period ${p} — ${def.title}</div><div style="font-size:12px;color:#1D9E75;font-weight:600;margin-top:3px">${def.dates}</div></div>${iS?`<span style="font-size:10px;background:#1D9E75;color:#fff;padding:3px 9px;border-radius:6px;font-weight:700">✓</span>`:''}</div><div style="font-size:12px;color:#666;margin-top:5px">Income: <strong style="color:#1D9E75">${fmtCad(tI)}</strong> · Spent: <strong style="color:#D85A30">${fmtCad(tE)}</strong> · ${fE.length} expense${fE.length!==1?'s':''}</div></div>`;}).join('');}
 function selectPeriod(p){selectedPeriod=p;renderSharePanel();}
 
 // ── PDF ───────────────────────────────────────────────────────────────────
 function exportPDF(){
   const def=getPDef(selectedPeriod);
   const exps=allExp().filter(def.f).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const incs=allInc().filter(def.f).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const incs=allInc().filter(def.f).filter(i=>!i.pending).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const name=document.getElementById('rpt-name').value||'Arun';
   const city=document.getElementById('rpt-city').value||'UofT Scarborough';
   const rptMsg=document.getElementById('rpt-msg').value||'';
@@ -1224,7 +1502,7 @@ ${mkExpSection('chequing','🏦 Chequing Account','#378ADD')}${mkExpSection('sav
 }
 
 // ── BACKUP ────────────────────────────────────────────────────────────────
-function downloadBackup(){const allE={},allI={};Object.keys(memExp).forEach(k=>allE[k]=memExp[k]);Object.keys(memInc).forEach(k=>allI[k]=memInc[k]);const blob=new Blob([JSON.stringify({version:'7.0',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Aruns_Wealth_Ledger_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);renderDataSummary();}
+function downloadBackup(){const allE={},allI={};Object.keys(memExp).forEach(k=>allE[k]=memExp[k]);Object.keys(memInc).forEach(k=>allI[k]=memInc[k]);const blob=new Blob([JSON.stringify({version:'7.1',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets,splits:memSplits},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Aruns_Wealth_Ledger_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);renderDataSummary();}
 
 // ── CSV EXPORT ────────────────────────────────────────────────────────────
 function csvEsc(v){v=(v===undefined||v===null)?'':String(v);if(/[",\n]/.test(v))v='"'+v.replace(/"/g,'""')+'"';return v;}
@@ -1241,7 +1519,7 @@ function downloadCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Aruns_Wealth_Ledger_'+localDateStr()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
   if(msg){msg.innerHTML='<span style="color:#1D9E75">✅ CSV exported!</span>';setTimeout(()=>{if(msg)msg.textContent='';},5000);}
 }
-function importBackup(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{try{const p=JSON.parse(e.target.result);if(!p.expenses)throw new Error();if(!confirm(`⚠️ Replace ALL data with backup from ${p.exportedAt?.split('T')[0]||'?'}?`))return;memExp=p.expenses||{};memInc=p.income||{};memBudgets=p.budgets||Object.fromEntries(CATS.map(c=>[c.name,0]));settings=Object.assign({over:true,warn:true,remain:true,theme:'system',displayCurrency:'CAD'},p.settings||{});readAlerts=new Set(settings.readAlerts||[]);memAccounts=p.accounts||{chequing:0,savings:0,creditCard:0,cash:0};memTransfers=p.transfers||[];memRecurring=p.recurring||[];memGoals=p.goals||[];memPresets=p.presets||[];['over','warn','remain'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value=settings.displayCurrency||'CAD';});applyTheme();await saveAll();generateRecurringDue();renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();renderQuickAdd();renderPresetSettings();document.getElementById('backup-import-msg').innerHTML='<span style="color:#1D9E75">✅ Backup restored!</span>';setTimeout(()=>document.getElementById('backup-import-msg').textContent='',5000);}catch(_){document.getElementById('backup-import-msg').innerHTML='<span style="color:#E24B4A">❌ Invalid file.</span>';}};reader.readAsText(file);ev.target.value='';}
+function importBackup(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{try{const p=JSON.parse(e.target.result);if(!p.expenses)throw new Error();if(!confirm(`⚠️ Replace ALL data with backup from ${p.exportedAt?.split('T')[0]||'?'}?`))return;memExp=p.expenses||{};memInc=p.income||{};memBudgets=p.budgets||Object.fromEntries(CATS.map(c=>[c.name,0]));settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},p.settings||{});readAlerts=new Set(settings.readAlerts||[]);memAccounts=p.accounts||{chequing:0,savings:0,creditCard:0,cash:0};memTransfers=p.transfers||[];memRecurring=p.recurring||[];memGoals=p.goals||[];memPresets=p.presets||[];memSplits=p.splits||[];['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value=settings.displayCurrency||'CAD';});applyTheme();await saveAll();generateRecurringDue();renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();renderQuickAdd();renderPresetSettings();renderCreditLimitForm();renderSplitsBanner();document.getElementById('backup-import-msg').innerHTML='<span style="color:#1D9E75">✅ Backup restored!</span>';setTimeout(()=>document.getElementById('backup-import-msg').textContent='',5000);}catch(_){document.getElementById('backup-import-msg').innerHTML='<span style="color:#E24B4A">❌ Invalid file.</span>';}};reader.readAsText(file);ev.target.value='';}
 async function resetAllData(){
   if(!confirm('⚠️ This will permanently delete ALL saved data — every expense, income entry, budget, savings goal, account balance, transfer, recurring item, quick-add preset and setting.\n\nThis cannot be undone. Consider downloading a backup first (Backup tab).\n\nContinue?'))return;
   if(!confirm('Are you absolutely sure? This is the last step — all data will be wiped.'))return;
@@ -1254,17 +1532,18 @@ async function resetAllData(){
   memExp={};memInc={};
   memBudgets=Object.fromEntries(CATS.map(c=>[c.name,0]));
   memAccounts={chequing:0,savings:0,creditCard:0,cash:0};
-  memTransfers=[];memRecurring=[];memGoals=[];memPresets=[];
+  memTransfers=[];memRecurring=[];memGoals=[];memPresets=[];memSplits=[];
   editingGoalId=null;fundingGoalId=null;editingPresetId=null;
-  settings={over:true,warn:true,remain:true,theme:'system',displayCurrency:'CAD'};
+  settings={over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'};
   readAlerts=new Set();
-  ['over','warn','remain'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});
+  ['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});
   const dc=document.getElementById('display-currency-sel');if(dc)dc.value='CAD';
   const bc=document.getElementById('budget-currency');if(bc)bc.value='CAD';
-  ['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value='CAD';});
+  ['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value='CAD';});
+  const cli=document.getElementById('credit-limit-input');if(cli)cli.value='';
   applyTheme();
   updateBadge();
-  renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();cancelEditPreset();renderQuickAdd();renderPresetSettings();
+  renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();cancelEditPreset();renderQuickAdd();renderPresetSettings();renderCreditLimitForm();renderSplitsBanner();
   if(msg){msg.innerHTML='<span style="color:#1D9E75">✅ All data cleared.</span>';setTimeout(()=>{if(msg)msg.textContent='';},5000);}
 }
 function renderDataSummary(){const allE=Object.values(memExp).flat(),allI=Object.values(memInc).flat();const months=new Set([...allE.map(e=>e.date?.slice(0,7)),...allI.map(e=>e.date?.slice(0,7))].filter(Boolean));const tE=allE.reduce((s,e)=>s+toCAD(e.amount,e.currency),0),tI=allI.reduce((s,e)=>s+toCAD(e.amount,e.currency),0);document.getElementById('data-summary').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="background:#F0FFFE;padding:10px;border-radius:8px"><div style="font-size:10px;color:#666;font-weight:700;text-transform:uppercase">Records</div><div style="font-size:18px;font-weight:700;color:#1D9E75;margin-top:4px">${allE.length+allI.length}</div></div><div style="background:#F0FFFE;padding:10px;border-radius:8px"><div style="font-size:10px;color:#666;font-weight:700;text-transform:uppercase">Months</div><div style="font-size:18px;font-weight:700;color:#1D9E75;margin-top:4px">${months.size}</div></div><div style="background:#F0FFFE;padding:10px;border-radius:8px"><div style="font-size:10px;color:#666;font-weight:700;text-transform:uppercase">All-time Income</div><div style="font-size:15px;font-weight:700;color:#1D9E75;margin-top:4px">${fmtCad(tI)}</div></div><div style="background:#FFF5F1;padding:10px;border-radius:8px"><div style="font-size:10px;color:#666;font-weight:700;text-transform:uppercase">All-time Spent</div><div style="font-size:15px;font-weight:700;color:#D85A30;margin-top:4px">${fmtCad(tE)}</div></div></div><div style="margin-top:10px;font-size:11px;color:#aaa">Last saved: ${new Date().toLocaleString('en-CA')}</div>`;}
@@ -1324,12 +1603,12 @@ function doConvert(){
   document.getElementById('inc-date').value=localDateStr(today);
   document.getElementById('trf-date').value=localDateStr(today);
   const dcSel=document.getElementById('display-currency-sel');if(dcSel)dcSel.value=settings.displayCurrency||'CAD';
-  ['exp-currency','inc-currency','trf-currency','budget-currency','goal-currency','preset-currency'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=settings.displayCurrency||'CAD';});
+  ['exp-currency','inc-currency','trf-currency','budget-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=settings.displayCurrency||'CAD';});
   applyTheme();
 
   await generateRecurringDue();
   updateDateDisplay();
-  renderDashboard();doConvert();renderBudgetForm();renderRecurringList();renderGoalsList();renderQuickAdd();updateBadge();
+  renderDashboard();doConvert();renderBudgetForm();renderRecurringList();renderGoalsList();renderQuickAdd();renderCreditLimitForm();renderSplitsBanner();updateBadge();
 
   await fetchRate();
 
