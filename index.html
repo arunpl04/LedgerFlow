@@ -511,6 +511,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
       <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0"><span style="font-size:13px;font-weight:600">Show remaining balance</span><button class="toggle on" id="tog-remain" onclick="toggleSetting('remain')"></button></div>
     </div>
     <div class="card"><h3>Alerts This Month</h3><div id="alerts-list"></div></div>
+    <div class="card"><h3 style="display:flex;justify-content:space-between;align-items:center">🕘 Notification History<button class="btn-sm" onclick="clearNotifHistory()" style="font-size:10.5px;font-weight:600">Clear</button></h3><p style="font-size:11px;color:var(--text-sub);margin-bottom:8px">Dismissed alerts and settled splits, most recent first.</p><div id="notif-history-list"></div></div>
   </div>
 </div>
 
@@ -685,6 +686,7 @@ let memRecurring=[];
 let memGoals=[];
 let memPresets=[];
 let memSplits=[];
+let memNotifHistory=[];
 
 let settings={over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'};
 let editingBalKey=null, selectedPeriod=1;
@@ -781,7 +783,8 @@ async function saveAll(){
     ['aruns_recurring',JSON.stringify(memRecurring)],
     ['aruns_goals',JSON.stringify(memGoals)],
     ['aruns_presets',JSON.stringify(memPresets)],
-    ['aruns_splits',JSON.stringify(memSplits)]
+    ['aruns_splits',JSON.stringify(memSplits)],
+    ['aruns_notifhist',JSON.stringify(memNotifHistory)]
   ];
   let ok=true;
   for(const[k,v] of tasks){try{await window.storage.set(k,v);}catch(_){ok=false;}}
@@ -789,7 +792,7 @@ async function saveAll(){
   setTimeout(()=>setSL('Auto-saving on'),ok?3000:4000);
   return ok;
 }
-async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('aruns_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('aruns_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('aruns_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('aruns_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('aruns_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('aruns_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('aruns_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('aruns_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('aruns_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('aruns_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('aruns_presets');memPresets=pr?JSON.parse(pr.value):[];const sp=await window.storage.get('aruns_splits');memSplits=sp?JSON.parse(sp.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
+async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('aruns_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('aruns_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('aruns_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('aruns_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('aruns_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('aruns_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('aruns_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('aruns_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('aruns_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('aruns_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('aruns_presets');memPresets=pr?JSON.parse(pr.value):[];const sp=await window.storage.get('aruns_splits');memSplits=sp?JSON.parse(sp.value):[];const nh=await window.storage.get('aruns_notifhist');memNotifHistory=nh?JSON.parse(nh.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
 function eKey(){return 'e_'+viewYear+'_'+viewMonth}
 function iKey(){return 'i_'+viewYear+'_'+viewMonth}
 function getExp(){return memExp[eKey()]||[]}
@@ -1226,10 +1229,14 @@ function splitsNetCAD(){
   const iOwe=items.filter(s=>s.direction==='i_owe').reduce((a,s)=>a+toCAD(s.amount,s.currency),0);
   return{owedToMe,iOwe,net:owedToMe-iOwe};
 }
+function logNotifHistory(text){
+  memNotifHistory.unshift({id:Date.now()+Math.random(),date:localDateStr(),text});
+  if(memNotifHistory.length>200)memNotifHistory.length=200;
+}
 function settleSplitItem(kind,refId){
-  if(kind==='legacy'){const s=memSplits.find(x=>x.id===refId);if(s){s.settled=true;s.settledDate=localDateStr();}}
-  else if(kind==='exp'){for(const k in memExp){const e=memExp[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.payMethod='cash';break;}}}
-  else if(kind==='inc'){for(const k in memInc){const e=memInc[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.pending=false;e.receivedIn='cash';break;}}}
+  if(kind==='legacy'){const s=memSplits.find(x=>x.id===refId);if(s){s.settled=true;s.settledDate=localDateStr();logNotifHistory(s.direction==='owe_me'?`✅ Received ${fmtCad(toCAD(s.amount,s.currency))} from ${s.person}`:`✅ Repaid ${s.person} ${fmtCad(toCAD(s.amount,s.currency))}`);}}
+  else if(kind==='exp'){for(const k in memExp){const e=memExp[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.payMethod='cash';logNotifHistory(`✅ Repaid ${e.splitPerson} ${fmtCad(toCAD(e.amount,e.currency))}`);break;}}}
+  else if(kind==='inc'){for(const k in memInc){const e=memInc[k].find(x=>x.id===refId);if(e){e.splitSettled=true;e.pending=false;e.receivedIn='cash';logNotifHistory(`✅ Received ${fmtCad(toCAD(e.amount,e.currency))} from ${e.splitPerson}`);break;}}}
   saveAll();renderDashboard();renderExpenseList();renderIncomeList();renderAlerts();
 }
 function removeSplit(id){
@@ -1434,8 +1441,22 @@ function computeCreditAlert(){
 }
 function computeAlerts(){const eBC={};getExp().forEach(e=>{const v=toCAD(e.amount,e.currency);eBC[e.cat]=(eBC[e.cat]||0)+v;});const alerts=[];const ca=computeCreditAlert();if(ca)alerts.push(ca);CATS.forEach(c=>{const s=eBC[c.name]||0,l=memBudgets[c.name]||0;if(!l)return;const p=s/l*100,r=l-s;if(settings.over&&s>l){const op=+((s-l)/l*100).toFixed(1);alerts.push({type:'over',cat:c.name,s,l,over:s-l,overPct:op});}else if(settings.warn&&p>=80)alerts.push({type:'warn',cat:c.name,s,l,p:Math.round(p),r});else if(settings.remain&&s>0)alerts.push({type:'ok',cat:c.name,s,l,r,p:Math.round(p)});});return alerts;}
 function alertKey(a){if(a.type==='credit-over'||a.type==='credit-warn')return 'credit_'+a.type;return viewYear+'_'+viewMonth+'_'+a.type+'_'+a.cat;}
-function markAlertRead(key){readAlerts.add(key);saveAll();renderAlerts();}
-function markAllAlertsRead(){computeAlerts().forEach(a=>readAlerts.add(alertKey(a)));saveAll();renderAlerts();}
+function alertLogText(a){
+  if(a.type==='credit-over')return `💳 Dismissed: Credit Card ${a.overPct}% over limit (Owed ${fmtCad(a.owed)} · Limit ${fmtCad(a.limit)})`;
+  if(a.type==='credit-warn')return `💳 Dismissed: Credit Card ${a.p}% of limit used (${fmtCad(a.r)} remaining)`;
+  if(a.type==='over')return `⛔ Dismissed: ${a.cat} ${a.overPct}% over budget (Spent ${fmtCad(a.s)} · Budget ${fmtCad(a.l)})`;
+  if(a.type==='warn')return `⚠️ Dismissed: ${a.cat} at ${a.p}% of budget (${fmtCad(a.r)} remaining)`;
+  return `✅ Dismissed: ${a.cat} at ${a.p}% of budget (${fmtCad(a.r)} remaining)`;
+}
+function markAlertRead(key){
+  const a=computeAlerts().find(x=>alertKey(x)===key);
+  if(a&&!readAlerts.has(key))logNotifHistory(alertLogText(a));
+  readAlerts.add(key);saveAll();renderAlerts();
+}
+function markAllAlertsRead(){
+  computeAlerts().forEach(a=>{const k=alertKey(a);if(!readAlerts.has(k))logNotifHistory(alertLogText(a));readAlerts.add(k);});
+  saveAll();renderAlerts();
+}
 function computeDebtAlerts(){
   return allExp().filter(e=>e.splitDir==='i_owe'&&e.splitPerson&&!e.splitSettled)
     .map(e=>({id:e.id,person:e.splitPerson,amount:e.amount,currency:e.currency,date:e.date}))
@@ -1445,7 +1466,7 @@ function updateBadge(){const n=computeAlerts().filter(a=>['over','warn','credit-
 function renderAlerts(){
   const alerts=computeAlerts(),debts=computeDebtAlerts(),el=document.getElementById('alerts-list');
   const debtHtml=debts.length?`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:#D85A30;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">🤝 Money You Owe</div>${debts.map(d=>`<div class="alert-item alert-over" style="align-items:center"><div style="flex:1"><div style="font-weight:800;color:#A32D2D">You need to repay ${d.person} ${fmtCad(toCAD(d.amount,d.currency))}</div><div style="color:#993C1D;margin-top:3px;font-size:12px">Since ${fmtDate(d.date)}</div></div><label style="display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;font-size:11px;font-weight:700;color:#A32D2D"><input type="checkbox" class="split-chk" onclick="settleSplitItem('exp',${d.id})">Repaid</label></div>`).join('')}</div>`:'';
-  if(!alerts.length){el.innerHTML=debtHtml+(debts.length?'':'<div class="empty">🎉 All clear — budgets and credit usage look good!</div>');updateBadge();return;}
+  if(!alerts.length){el.innerHTML=debtHtml+(debts.length?'':'<div class="empty">🎉 All clear — budgets and credit usage look good!</div>');updateBadge();renderNotifHistory();return;}
   const anyUnread=alerts.some(a=>!readAlerts.has(alertKey(a)));
   const markAllBtn=anyUnread?`<button class="btn-sm" onclick="markAllAlertsRead()" style="width:100%;margin-bottom:10px;border-color:#1D9E75;color:#1D9E75">✓ Mark all as read</button>`:'';
   el.innerHTML=debtHtml+markAllBtn+alerts.map(a=>{
@@ -1458,6 +1479,16 @@ function renderAlerts(){
     return `<div class="alert-item alert-ok" style="align-items:center;opacity:${isRead?'.55':'1'}"><div style="flex:1"><div style="font-weight:700;color:#0F6E56">✅ ${a.cat} — ${a.p}% used</div><div style="color:#0F6E56;margin-top:3px;font-size:12px">${fmtCad(a.r)} remaining</div></div>${readBtn}</div>`;
   }).join('');
   updateBadge();
+  renderNotifHistory();
+}
+function renderNotifHistory(){
+  const el=document.getElementById('notif-history-list');if(!el)return;
+  if(!memNotifHistory.length){el.innerHTML='<div class="empty">No history yet — dismissed alerts and settled splits will show up here</div>';return;}
+  el.innerHTML=memNotifHistory.slice(0,40).map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--list-border)"><span style="font-size:12px;color:var(--text-sub)">${h.text}</span><span style="font-size:10px;color:var(--text-faint);white-space:nowrap">${fmtDate(h.date)}</span></div>`).join('');
+}
+function clearNotifHistory(){
+  if(!confirm('Clear all notification history? This cannot be undone.'))return;
+  memNotifHistory=[];saveAll();renderNotifHistory();
 }
 function toggleSetting(k){settings[k]=!settings[k];saveAll();document.getElementById('tog-'+k).className='toggle '+(settings[k]?'on':'off');renderAlerts();}
 
@@ -1532,7 +1563,7 @@ async function resetAllData(){
   memExp={};memInc={};
   memBudgets=Object.fromEntries(CATS.map(c=>[c.name,0]));
   memAccounts={chequing:0,savings:0,creditCard:0,cash:0};
-  memTransfers=[];memRecurring=[];memGoals=[];memPresets=[];memSplits=[];
+  memTransfers=[];memRecurring=[];memGoals=[];memPresets=[];memSplits=[];memNotifHistory=[];
   editingGoalId=null;fundingGoalId=null;editingPresetId=null;
   settings={over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'};
   readAlerts=new Set();
