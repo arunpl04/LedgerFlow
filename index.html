@@ -238,7 +238,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
 <!-- HEADER -->
 <div class="header">
   <div class="header-title-row">
-    <h1>🏦 Ledger Flow</h1>
+    <h1>🏦 LedgerFlow</h1>
     <div class="header-btns">
       <button class="hdr-btn" onclick="openPanel('alerts')" aria-label="Notifications">🔔<span id="badge" class="notif-badge" style="display:none">0</span></button>
       <button class="hdr-btn" onclick="openPanel('settings')" aria-label="Settings">⚙️</button>
@@ -494,7 +494,7 @@ select:focus,input:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px 
 
 <!-- FOOTER -->
 <div class="app-footer">
-  © 2026 <strong style="color:#1D9E75">Ledger Flow</strong>. All Rights Reserved.<br>
+  © 2026 <strong style="color:#1D9E75">LedgerFlow</strong>. All Rights Reserved.<br>
   <span style="font-size:11px;color:var(--text-sub);font-weight:600">Designed &amp; Developed by Arunachalam Palaniappan</span>
 </div>
 </div><!-- /wrap -->
@@ -752,10 +752,10 @@ async function fetchRate(){
     if(d.rates?.INR&&d.rates?.USD){
       INR_RATE=+d.rates.INR.toFixed(2);USD_RATE=+d.rates.USD.toFixed(4);USD_INR=+(INR_RATE/USD_RATE).toFixed(2);
       rateTs=new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'});
-      try{await window.storage.set('aruns_rate',JSON.stringify({INR_RATE,USD_RATE,USD_INR,ts:rateTs}));}catch(_){}
+      try{await window.storage.set('ledgerflow_rate',JSON.stringify({INR_RATE,USD_RATE,USD_INR,ts:rateTs}));}catch(_){}
     }
   }catch(_){
-    try{const sv=await window.storage.get('aruns_rate');if(sv){const o=JSON.parse(sv.value);INR_RATE=o.INR_RATE||61.5;USD_RATE=o.USD_RATE||0.73;USD_INR=o.USD_INR||84;rateTs=o.ts;}}catch(__){}}
+    try{const sv=await window.storage.get('ledgerflow_rate');if(sv){const o=JSON.parse(sv.value);INR_RATE=o.INR_RATE||61.5;USD_RATE=o.USD_RATE||0.73;USD_INR=o.USD_INR||84;rateTs=o.ts;}}catch(__){}}
   updateRateDisplay();doConvert();
 }
 function refreshRate(){fetchRate();}
@@ -774,17 +774,17 @@ async function saveAll(){
   setSL('Saving…');
   settings.readAlerts=Array.from(readAlerts);
   const tasks=[
-    ['aruns_e_'+viewYear+'_'+viewMonth,JSON.stringify(getExp())],
-    ['aruns_i_'+viewYear+'_'+viewMonth,JSON.stringify(getInc())],
-    ['aruns_budgets',JSON.stringify(memBudgets)],
-    ['aruns_settings',JSON.stringify(settings)],
-    ['aruns_accounts',JSON.stringify(memAccounts)],
-    ['aruns_transfers',JSON.stringify(memTransfers)],
-    ['aruns_recurring',JSON.stringify(memRecurring)],
-    ['aruns_goals',JSON.stringify(memGoals)],
-    ['aruns_presets',JSON.stringify(memPresets)],
-    ['aruns_splits',JSON.stringify(memSplits)],
-    ['aruns_notifhist',JSON.stringify(memNotifHistory)]
+    ['ledgerflow_e_'+viewYear+'_'+viewMonth,JSON.stringify(getExp())],
+    ['ledgerflow_i_'+viewYear+'_'+viewMonth,JSON.stringify(getInc())],
+    ['ledgerflow_budgets',JSON.stringify(memBudgets)],
+    ['ledgerflow_settings',JSON.stringify(settings)],
+    ['ledgerflow_accounts',JSON.stringify(memAccounts)],
+    ['ledgerflow_transfers',JSON.stringify(memTransfers)],
+    ['ledgerflow_recurring',JSON.stringify(memRecurring)],
+    ['ledgerflow_goals',JSON.stringify(memGoals)],
+    ['ledgerflow_presets',JSON.stringify(memPresets)],
+    ['ledgerflow_splits',JSON.stringify(memSplits)],
+    ['ledgerflow_notifhist',JSON.stringify(memNotifHistory)]
   ];
   let ok=true;
   for(const[k,v] of tasks){try{await window.storage.set(k,v);}catch(_){ok=false;}}
@@ -792,7 +792,7 @@ async function saveAll(){
   setTimeout(()=>setSL('Auto-saving on'),ok?3000:4000);
   return ok;
 }
-async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('aruns_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('aruns_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('aruns_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('aruns_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('aruns_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('aruns_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('aruns_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('aruns_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('aruns_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('aruns_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('aruns_presets');memPresets=pr?JSON.parse(pr.value):[];const sp=await window.storage.get('aruns_splits');memSplits=sp?JSON.parse(sp.value):[];const nh=await window.storage.get('aruns_notifhist');memNotifHistory=nh?JSON.parse(nh.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
+async function loadAll(){setSL('Loading…');try{const ek=await window.storage.list('ledgerflow_e_');if(ek?.keys)for(const k of ek.keys){const v=await window.storage.get(k);if(v){const arr=JSON.parse(v.value);memExp[k.replace('ledgerflow_','')]=arr.map(e=>{const{receipt,...rest}=e;return{...rest,cat:CAT_MIG[e.cat]||e.cat};});}}const ik=await window.storage.list('ledgerflow_i_');if(ik?.keys)for(const k of ik.keys){const v=await window.storage.get(k);if(v)memInc[k.replace('ledgerflow_','')]=JSON.parse(v.value);}const bgt=await window.storage.get('ledgerflow_budgets');if(bgt)memBudgets=JSON.parse(bgt.value);const set=await window.storage.get('ledgerflow_settings');if(set){settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},JSON.parse(set.value));readAlerts=new Set(settings.readAlerts||[]);['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';}const acc=await window.storage.get('ledgerflow_accounts');if(acc)memAccounts=JSON.parse(acc.value);const trf=await window.storage.get('ledgerflow_transfers');if(trf)memTransfers=JSON.parse(trf.value);const rec=await window.storage.get('ledgerflow_recurring');if(rec)memRecurring=JSON.parse(rec.value);const gl=await window.storage.get('ledgerflow_goals');memGoals=gl?JSON.parse(gl.value):[];const pr=await window.storage.get('ledgerflow_presets');memPresets=pr?JSON.parse(pr.value):[];const sp=await window.storage.get('ledgerflow_splits');memSplits=sp?JSON.parse(sp.value):[];const nh=await window.storage.get('ledgerflow_notifhist');memNotifHistory=nh?JSON.parse(nh.value):[];setSL('Loaded ✓');setTimeout(()=>setSL('Auto-saving on'),2000);}catch(_){setSL('Starting fresh');}}
 function eKey(){return 'e_'+viewYear+'_'+viewMonth}
 function iKey(){return 'i_'+viewYear+'_'+viewMonth}
 function getExp(){return memExp[eKey()]||[]}
@@ -1514,8 +1514,8 @@ function exportPDF(){
   const acctCards=ACCTS.map(a=>{const bal=calcBalance(a.key);return `<div style="flex:1;min-width:130px;border-left:4px solid ${a.color};background:${a.bg};padding:12px 14px;border-radius:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:${a.color};margin-bottom:4px">${a.icon} ${a.label}</div><div style="font-size:17px;font-weight:700;color:${bal<0?'#E24B4A':a.color}">${fmtCad(bal)}</div><div style="font-size:10px;color:#888;margin-top:2px">${fmtSecondary(bal)}</div></div>`;}).join('');
   const mkExpSection=(key,label,col)=>{const rows=exps.filter(e=>(e.payMethod||'cash')===key);if(!rows.length)return '';const tot=rows.reduce((s,e)=>s+toCAD(e.amount,e.currency),0);return `<div style="margin-top:16px"><div style="background:${col};color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;padding:8px 14px;border-radius:8px 8px 0 0">${label}</div><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th style="text-align:right">Amount (${primCur})</th><th style="text-align:right">Amount (${secCur})</th></tr></thead><tbody>${rows.map((e,i)=>`<tr style="background:${i%2===0?'#fff':'#fafafa'}"><td>${fmtDate(e.date)}</td><td>${e.note||'—'}</td><td>${e.cat}</td><td style="text-align:right;font-weight:600">${fmtCad(toCAD(e.amount,e.currency))}</td><td style="text-align:right">${fmtSecondary(toCAD(e.amount,e.currency))}</td></tr>`).join('')}<tr style="background:#f0f0f0;font-weight:700"><td colspan="3">Total — ${label}</td><td style="text-align:right;color:${col}">${fmtCad(tot)}</td><td style="text-align:right">${fmtSecondary(tot)}</td></tr></tbody></table></div>`;};
   const budgetRows=CATS.filter(c=>catT[c.name]>0).map((c,i)=>{const s=catT[c.name],b=memBudgets[c.name];if(!b)return `<tr style="background:${i%2===0?'#fff':'#fafafa'}"><td>${c.name}</td><td style="text-align:right;color:#aaa">No budget</td><td style="text-align:right;font-weight:600">${fmtCad(s)}</td><td style="text-align:right;color:#aaa">—</td><td style="text-align:right;color:#aaa">—</td></tr>`;const p=Math.round(s/b*100);const over=s>b;const overPct=over?+((s-b)/b*100).toFixed(1):null;const col=over?'#E24B4A':p>80?'#BA7517':'#0F6E56';const remain=over?`-${fmtCad(s-b)}`:fmtCad(b-s);return `<tr style="background:${i%2===0?'#fff':'#fafafa'}"><td>${c.name}</td><td style="text-align:right">${fmtCad(b)}</td><td style="text-align:right;font-weight:600">${fmtCad(s)}</td><td style="text-align:right;font-weight:700;color:${col}">${remain}</td><td style="text-align:right;font-weight:700;color:${col}">${over?`${overPct}% over`:`${p}%`}</td></tr>`;}).join('');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ledger Flow — ${name}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Trebuchet MS',Arial,sans-serif;background:#fff;color:#333;font-size:13px;padding:24px;max-width:860px;margin:0 auto}.hdr{background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;padding:22px 26px;border-radius:12px;margin-bottom:20px}.hdr h1{font-size:22px;font-weight:700;margin-bottom:5px}.hdr .sub{font-size:12px;opacity:.85;line-height:1.7}.pill{display:inline-block;background:rgba(255,255,255,.22);border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;margin-top:7px}.msg-box{background:#E1F5EE;border-left:4px solid #1D9E75;padding:11px 15px;border-radius:8px;font-size:12px;color:#0F6E56;margin-bottom:18px;font-style:italic}.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.sum-box{border-radius:10px;padding:14px;text-align:center}.sum-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;color:#555}.sum-val{font-size:20px;font-weight:700}.sum-sub{font-size:11px;color:#888;margin-top:4px}.sec-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;padding:8px 13px;border-radius:7px;margin-top:20px;margin-bottom:8px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#555;color:#fff;padding:7px 9px;text-align:left;font-size:11px;font-weight:700}td{padding:7px 9px;border-bottom:1px solid #f0f0f0}.footer{margin-top:28px;padding-top:14px;border-top:2px solid #E1F5EE;font-size:11px;color:#888;text-align:center;line-height:2}@media print{.no-print{display:none}}</style></head><body>
-<div class="hdr"><h1>🏦 Ledger Flow</h1><div class="sub"><strong>${name}</strong> · ${city} · Amounts shown in ${primCur} (ref. ${secCur}) · 1 CAD=₹${INR_RATE} · 1 USD=₹${USD_INR} · ${new Date().toLocaleDateString('en-CA')}</div><div class="pill">📅 ${def.label}</div></div>
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LedgerFlow — ${name}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Trebuchet MS',Arial,sans-serif;background:#fff;color:#333;font-size:13px;padding:24px;max-width:860px;margin:0 auto}.hdr{background:linear-gradient(135deg,#1D9E75,#0F6E56);color:#fff;padding:22px 26px;border-radius:12px;margin-bottom:20px}.hdr h1{font-size:22px;font-weight:700;margin-bottom:5px}.hdr .sub{font-size:12px;opacity:.85;line-height:1.7}.pill{display:inline-block;background:rgba(255,255,255,.22);border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;margin-top:7px}.msg-box{background:#E1F5EE;border-left:4px solid #1D9E75;padding:11px 15px;border-radius:8px;font-size:12px;color:#0F6E56;margin-bottom:18px;font-style:italic}.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.sum-box{border-radius:10px;padding:14px;text-align:center}.sum-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;color:#555}.sum-val{font-size:20px;font-weight:700}.sum-sub{font-size:11px;color:#888;margin-top:4px}.sec-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;padding:8px 13px;border-radius:7px;margin-top:20px;margin-bottom:8px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#555;color:#fff;padding:7px 9px;text-align:left;font-size:11px;font-weight:700}td{padding:7px 9px;border-bottom:1px solid #f0f0f0}.footer{margin-top:28px;padding-top:14px;border-top:2px solid #E1F5EE;font-size:11px;color:#888;text-align:center;line-height:2}@media print{.no-print{display:none}}</style></head><body>
+<div class="hdr"><h1>🏦 LedgerFlow</h1><div class="sub"><strong>${name}</strong> · ${city} · Amounts shown in ${primCur} (ref. ${secCur}) · 1 CAD=₹${INR_RATE} · 1 USD=₹${USD_INR} · ${new Date().toLocaleDateString('en-CA')}</div><div class="pill">📅 ${def.label}</div></div>
 ${rptMsg?`<div class="msg-box">💬 ${rptMsg}</div>`:''}
 <div class="sum-grid"><div class="sum-box" style="background:#E1F5EE"><div class="sum-label">💚 Total Income</div><div class="sum-val" style="color:#1D9E75">${fmtCad(tI)}</div><div class="sum-sub">${fmtSecondary(tI)}</div></div><div class="sum-box" style="background:#FFF5F1"><div class="sum-label">💸 Total Expenses</div><div class="sum-val" style="color:#D85A30">${fmtCad(tE)}</div><div class="sum-sub">${fmtSecondary(tE)}</div></div><div class="sum-box" style="background:${net>=0?'#E1F5EE':'#FFF3F3'}"><div class="sum-label">${net>=0?'💰 Saved':'⚠️ Overspent'}</div><div class="sum-val" style="color:${net>=0?'#1D9E75':'#E24B4A'}">${net<0?'-':''}${fmtCad(Math.abs(net))}</div><div class="sum-sub">${fmtSecondary(Math.abs(net))}</div></div></div>
 <div class="sec-hdr" style="background:#333">🏦 Account Balances</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px">${acctCards}</div>
@@ -1525,7 +1525,7 @@ ${rptMsg?`<div class="msg-box">💬 ${rptMsg}</div>`:''}
 ${mkExpSection('chequing','🏦 Chequing Account','#378ADD')}${mkExpSection('savings','💰 Savings Account','#1D9E75')}${mkExpSection('creditCard','💳 Credit Card','#D85A30')}${mkExpSection('cash','💵 Cash','#EF9F27')}${!exps.length?'<p style="text-align:center;color:#aaa;padding:18px;background:#fafafa;border-radius:8px">No expenses this period</p>':''}
 <div class="sec-hdr" style="background:#533FAA">📊 Spending by Category</div>
 <table><thead><tr><th>Category</th><th style="text-align:right">Budget</th><th style="text-align:right">Spent (${primCur})</th><th style="text-align:right">Remaining</th><th style="text-align:right">Status</th></tr></thead><tbody>${budgetRows||'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:12px">No expenses</td></tr>'}${Object.keys(catT).length?`<tr style="background:#f0f0f0;font-weight:700"><td>Grand Total</td><td style="text-align:right">${fmtCad(tB)}</td><td style="text-align:right">${fmtCad(tE)}</td><td style="text-align:right;color:${tB-tE<0?'#E24B4A':'#0F6E56'}">${tB-tE<0?`-${fmtCad(tE-tB)}`:fmtCad(tB-tE)}</td><td></td></tr>`:''}</tbody></table>
-<div class="footer">Designed &amp; built by <strong style="color:#1D9E75">Arunachalam Palaniappan</strong><br><span style="font-size:10px">Ledger Flow · Reported in ${primCur} · 1 CAD=₹${INR_RATE} · 1 USD=₹${USD_INR} · ${new Date().toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'})}</span></div>
+<div class="footer">Designed &amp; Developed by <strong style="color:#1D9E75">Arunachalam Palaniappan</strong><br><span style="font-size:10px">LedgerFlow · Reported in ${primCur} · 1 CAD=₹${INR_RATE} · 1 USD=₹${USD_INR} · ${new Date().toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'})}</span></div>
 <div class="no-print" style="text-align:center;margin-top:18px;padding-bottom:10px"><button onclick="window.print()" style="background:#D85A30;color:#fff;border:none;padding:13px 30px;border-radius:9px;font-size:15px;cursor:pointer;font-family:'Trebuchet MS',Arial;font-weight:700">🖨️ Print / Save as PDF</button></div>
 </body></html>`);win.document.close();
   document.getElementById('export-msg').innerHTML=`<span style="color:#D85A30">✅ "${def.title}" opened — tap Print → Save as PDF.</span>`;
@@ -1533,7 +1533,7 @@ ${mkExpSection('chequing','🏦 Chequing Account','#378ADD')}${mkExpSection('sav
 }
 
 // ── BACKUP ────────────────────────────────────────────────────────────────
-function downloadBackup(){const allE={},allI={};Object.keys(memExp).forEach(k=>allE[k]=memExp[k]);Object.keys(memInc).forEach(k=>allI[k]=memInc[k]);const blob=new Blob([JSON.stringify({version:'7.1',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets,splits:memSplits},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Aruns_Wealth_Ledger_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);renderDataSummary();}
+function downloadBackup(){const allE={},allI={};Object.keys(memExp).forEach(k=>allE[k]=memExp[k]);Object.keys(memInc).forEach(k=>allI[k]=memInc[k]);const blob=new Blob([JSON.stringify({version:'7.1',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets,splits:memSplits},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LedgerFlow_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);renderDataSummary();}
 
 // ── CSV EXPORT ────────────────────────────────────────────────────────────
 function csvEsc(v){v=(v===undefined||v===null)?'':String(v);if(/[",\n]/.test(v))v='"'+v.replace(/"/g,'""')+'"';return v;}
@@ -1547,7 +1547,7 @@ function downloadCSV(){
   const header=['Date','Type','Category / Source','Amount','Currency','Amount (CAD)','Account','Note'];
   const csv=[header,...data].map(r=>r.map(csvEsc).join(',')).join('\r\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Aruns_Wealth_Ledger_'+localDateStr()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LedgerFlow_'+localDateStr()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
   if(msg){msg.innerHTML='<span style="color:#1D9E75">✅ CSV exported!</span>';setTimeout(()=>{if(msg)msg.textContent='';},5000);}
 }
 function importBackup(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{try{const p=JSON.parse(e.target.result);if(!p.expenses)throw new Error();if(!confirm(`⚠️ Replace ALL data with backup from ${p.exportedAt?.split('T')[0]||'?'}?`))return;memExp=p.expenses||{};memInc=p.income||{};memBudgets=p.budgets||Object.fromEntries(CATS.map(c=>[c.name,0]));settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},p.settings||{});readAlerts=new Set(settings.readAlerts||[]);memAccounts=p.accounts||{chequing:0,savings:0,creditCard:0,cash:0};memTransfers=p.transfers||[];memRecurring=p.recurring||[];memGoals=p.goals||[];memPresets=p.presets||[];memSplits=p.splits||[];['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value=settings.displayCurrency||'CAD';});applyTheme();await saveAll();generateRecurringDue();renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();renderQuickAdd();renderPresetSettings();renderCreditLimitForm();renderSplitsBanner();document.getElementById('backup-import-msg').innerHTML='<span style="color:#1D9E75">✅ Backup restored!</span>';setTimeout(()=>document.getElementById('backup-import-msg').textContent='',5000);}catch(_){document.getElementById('backup-import-msg').innerHTML='<span style="color:#E24B4A">❌ Invalid file.</span>';}};reader.readAsText(file);ev.target.value='';}
@@ -1557,7 +1557,7 @@ async function resetAllData(){
   const msg=document.getElementById('reset-msg');
   if(msg)msg.innerHTML='<span style="color:var(--text-sub)">Clearing…</span>';
   try{
-    const all=await window.storage.list('aruns_');
+    const all=await window.storage.list('ledgerflow_');
     if(all?.keys)for(const k of all.keys){try{await window.storage.delete(k);}catch(_){}}
   }catch(_){}
   memExp={};memInc={};
