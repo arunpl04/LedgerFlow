@@ -118,8 +118,8 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
 
 /* ── SNAPSHOT BANNERS ── */
 .snapshot-banner{border-radius:12px;padding:.85rem 1.1rem;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.nw-banner{background:linear-gradient(135deg,rgba(127,119,221,.14),rgba(83,63,170,.08));border:1px solid rgba(127,119,221,.28)}
-.sts-banner{background:linear-gradient(135deg,rgba(14,92,70,.12),rgba(15,110,86,.07));border:1px solid rgba(14,92,70,.25)}
+.nw-banner{background:linear-gradient(135deg,rgba(127,119,221,.24),rgba(83,63,170,.14));border:1.5px solid rgba(127,119,221,.45);box-shadow:0 2px 10px var(--shadow)}
+.sts-banner{background:linear-gradient(135deg,rgba(14,92,70,.22),rgba(15,110,86,.13));border:1.5px solid rgba(14,92,70,.4);box-shadow:0 2px 10px var(--shadow)}
 .splits-banner{background:linear-gradient(135deg,rgba(79,176,198,.16),rgba(79,176,198,.06));border:1px solid rgba(79,176,198,.3)}
 
 /* ── MONTH NAV ── */
@@ -959,7 +959,7 @@ function renderDashboard(){
 function renderNetWorth(){
   const el=document.getElementById('nw-banner');if(!el)return;
   const nw=ACCTS.reduce((s,a)=>s+calcBalance(a.key),0);
-  el.innerHTML=`<div><div style="font-size:10px;font-weight:700;color:#7F77DD;text-transform:uppercase;letter-spacing:.05em">💎 Net Worth</div><div style="font-size:10px;color:var(--text-faint);margin-top:2px">All accounts combined</div></div><div style="text-align:right"><div style="font-size:21px;font-weight:700;color:${nw<0?'#E24B4A':'#533FAA'}">${nw<0?'-':''}${fmtCad(Math.abs(nw))}</div><div style="font-size:10px;color:var(--text-faint)">${fmtSecondary(Math.abs(nw))}</div></div>`;
+  el.innerHTML=`<div><div style="font-size:10px;font-weight:700;color:#533FAA;text-transform:uppercase;letter-spacing:.05em">💎 Net Worth</div><div style="font-size:10px;color:var(--text-sub);margin-top:2px">All accounts combined</div></div><div style="text-align:right"><div style="font-size:21px;font-weight:700;color:${nw<0?'#E24B4A':'#533FAA'}">${nw<0?'-':''}${fmtCad(Math.abs(nw))}</div><div style="font-size:10px;color:var(--text-sub)">${fmtSecondary(Math.abs(nw))}</div></div>`;
 }
 
 // ── SAFE-TO-SPEND ─────────────────────────────────────────────────────────
@@ -968,7 +968,7 @@ function renderSafeToSpend(tI,tB){
   if(tI===undefined){tI=getInc().filter(i=>!i.pending).reduce((s,e)=>s+toCAD(e.amount,e.currency),0);}
   if(tB===undefined){tB=Object.values(memBudgets).reduce((a,b)=>a+b,0);}
   const sts=tI-tB;
-  el.innerHTML=`<div><div style="font-size:10px;font-weight:700;color:#0E5C46;text-transform:uppercase;letter-spacing:.05em">💡 Safe to Spend</div><div style="font-size:10px;color:var(--text-faint);margin-top:2px">Income minus budgeted bills, ${MONTHS[viewMonth]}</div></div><div style="font-size:21px;font-weight:700;color:${sts<0?'#E24B4A':'#073D2E'}">${sts<0?'-':''}${fmtCad(Math.abs(sts))}</div>`;
+  el.innerHTML=`<div><div style="font-size:10px;font-weight:700;color:#073D2E;text-transform:uppercase;letter-spacing:.05em">💡 Safe to Spend</div><div style="font-size:10px;color:var(--text-sub);margin-top:2px">Income minus budgeted bills, ${MONTHS[viewMonth]}</div></div><div style="text-align:right"><div style="font-size:21px;font-weight:700;color:${sts<0?'#E24B4A':'#073D2E'}">${sts<0?'-':''}${fmtCad(Math.abs(sts))}</div><div style="font-size:10px;color:var(--text-sub)">${fmtSecondary(Math.abs(sts))}</div></div>`;
 }
 
 // ── INCOME ────────────────────────────────────────────────────────────────
