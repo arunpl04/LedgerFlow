@@ -667,6 +667,11 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
       <div><label class="lbl" id="bal-modal-label">Starting Balance</label><input type="number" id="bal-input" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
       <div><label class="lbl">Currency</label><select id="bal-currency"><option value="CAD">CAD $</option><option value="USD">USD $</option><option value="INR">INR ₹</option></select></div>
     </div>
+    <div id="bal-owe-row" style="display:none;margin-bottom:14px">
+      <label class="lbl">Amount You Owe <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-faint)">(optional)</span></label>
+      <input type="number" id="bal-owe-input" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      <p style="font-size:11px;color:var(--text-sub);margin-top:6px;line-height:1.5">Already carrying a balance on this card? Enter what you currently owe — it feeds into your credit usage tracking. Leave blank if you're starting fresh.</p>
+    </div>
     <button class="btn btn-primary" onclick="saveStartingBal()" style="width:100%">✅ Save</button>
   </div>
 </div>
@@ -986,11 +991,16 @@ function calcBalance(k){const s=memAccounts[k]||0;const eT=allExp().filter(e=>(e
 // This is independent of how large the Starting Balance itself is —
 // entering $1,000 there no longer hides utilization; a $100 charge
 // against a $500 limit always shows 20%, $400 remaining, regardless.
+// "Amount You Owe" (memAccounts.creditCardOwed) is a separate OPTIONAL value
+// set in the balance modal — any pre-existing debt on the card from before
+// tracking started. It's simply added on top, so someone who starts fresh
+// (leaves it blank) sees exactly the same numbers as before this field existed.
 function creditUtilPct(){
   const limit=settings.creditLimit||0;
   const startBal=memAccounts.creditCard||0;
   const curBal=calcBalance('creditCard');
-  const owed=Math.max(0,startBal-curBal); // net amount spent/charged against the limit
+  const openingOwed=memAccounts.creditCardOwed||0;
+  const owed=openingOwed+Math.max(0,startBal-curBal); // pre-existing debt + net amount spent/charged against the limit
   const pct=(limit>0)?Math.round((owed/limit)*100):0;
   return{owed,limit,pct,hasLimit:limit>0};
 }
@@ -1004,8 +1014,30 @@ function openBalModal(k){editingBalKey=k;const a=ACCTS.find(x=>x.key===k);docume
   help.innerHTML=(k==='creditCard')
     ?'Set the available balance on this card <strong>before</strong> tracking started. Transactions update it automatically. Your <strong>Credit Limit</strong> (set separately in Settings) is what the "% of the limit" on this card tracks against.'
     :'Set the amount already in this account <strong>before</strong> tracking started. Transactions update it automatically.';
+  // Amount You Owe: a separate, OPTIONAL field shown only for Credit Card.
+  // It seeds any pre-existing debt on the card (money already owed before
+  // tracking started) into the credit-usage tracking — independent of the
+  // Starting Balance above, which stays a plain "money you have" figure
+  // like every other account.
+  const oweRow=document.getElementById('bal-owe-row');
+  if(oweRow){
+    if(k==='creditCard'){
+      oweRow.style.display='block';
+      const storedOwe=memAccounts.creditCardOwed||0;
+      const dispOwe=fromCAD(storedOwe,cur);
+      document.getElementById('bal-owe-input').value=storedOwe?(cur==='INR'?Math.round(dispOwe):+dispOwe.toFixed(2)):'';
+    }else{
+      oweRow.style.display='none';
+    }
+  }
   document.getElementById('bal-modal').style.display='flex';setTimeout(()=>document.getElementById('bal-input').focus(),100);}
-function saveStartingBal(){const cur=document.getElementById('bal-currency')?.value||'CAD';const val=parseFloat(document.getElementById('bal-input').value)||0;memAccounts[editingBalKey]=toCAD(val,cur);saveAll();renderAccountCards();document.getElementById('bal-modal').style.display='none';}
+function saveStartingBal(){const cur=document.getElementById('bal-currency')?.value||'CAD';const val=parseFloat(document.getElementById('bal-input').value)||0;memAccounts[editingBalKey]=toCAD(val,cur);
+  if(editingBalKey==='creditCard'){
+    const oweInput=document.getElementById('bal-owe-input');
+    const oweVal=parseFloat(oweInput?.value)||0;
+    memAccounts.creditCardOwed=toCAD(oweVal,cur);
+  }
+  saveAll();renderAccountCards();document.getElementById('bal-modal').style.display='none';}
 
 // ── CREDIT LIMIT ──────────────────────────────────────────────────────────
 function renderCreditLimitForm(){
