@@ -662,9 +662,9 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
       <span id="bal-modal-title" style="font-size:15px;font-weight:700;color:#163C2E"></span>
       <button class="btn-sm" onclick="document.getElementById('bal-modal').style.display='none'" style="min-width:40px;min-height:40px">✕</button>
     </div>
-    <p style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6">Set the amount already in this account <strong>before</strong> tracking started. Transactions update it automatically.</p>
+    <p id="bal-modal-help" style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6"></p>
     <div class="form-row" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
-      <div><label class="lbl">Starting Balance</label><input type="number" id="bal-input" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
+      <div><label class="lbl" id="bal-modal-label">Starting Balance</label><input type="number" id="bal-input" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
       <div><label class="lbl">Currency</label><select id="bal-currency"><option value="CAD">CAD $</option><option value="USD">USD $</option><option value="INR">INR ₹</option></select></div>
     </div>
     <button class="btn btn-primary" onclick="saveStartingBal()" style="width:100%">✅ Save</button>
@@ -972,7 +972,17 @@ function dispAmtConv(e){
 }
 
 // ── ACCOUNTS ──────────────────────────────────────────────────────────────
-function calcBalance(k){const s=memAccounts[k]||0;const eT=allExp().filter(e=>(e.payMethod||'cash')===k).reduce((a,e)=>a+toCAD(e.amount,e.currency),0);const iT=allInc().filter(i=>!i.pending&&(i.receivedIn||'chequing')===k).reduce((a,i)=>a+toCAD(i.amount,i.currency),0);const tIn=memTransfers.filter(t=>t.to===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);const tOut=memTransfers.filter(t=>t.from===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);return s+iT-eT+tIn-tOut;}
+// FIX (Credit Card Starting Balance sign): for Chequing/Savings/Cash, a
+// Starting Balance is money you already HAVE, so it's added. For a Credit
+// Card, a Starting Balance represents debt you already OWED before you
+// started tracking — it should make you owe MORE, not less. Previously
+// both cases added `s` the same way, so entering e.g. $1,000 there acted
+// like a credit cushion that silently absorbed real charges (a $100 room
+// rent charge would raise the balance to $900 "positive", clamping owed to
+// $0 and utilization to 0% even though $100 was genuinely spent). Flipping
+// the sign for the credit card only means new charges always count fully
+// against the limit, regardless of what was entered as Starting Balance.
+function calcBalance(k){const raw=memAccounts[k]||0;const s=(k==='creditCard')?-raw:raw;const eT=allExp().filter(e=>(e.payMethod||'cash')===k).reduce((a,e)=>a+toCAD(e.amount,e.currency),0);const iT=allInc().filter(i=>!i.pending&&(i.receivedIn||'chequing')===k).reduce((a,i)=>a+toCAD(i.amount,i.currency),0);const tIn=memTransfers.filter(t=>t.to===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);const tOut=memTransfers.filter(t=>t.from===k).reduce((a,t)=>a+toCAD(t.amount,t.currency),0);return s+iT-eT+tIn-tOut;}
 // ── FIX (Credit Card Limit % display bug) ──────────────────────────────────
 // creditUtilPct() now ALWAYS returns a valid object instead of `null` when
 // no limit is set. Previously, a limit of 0/undefined short-circuited the
@@ -991,8 +1001,14 @@ function creditUtilPct(){
   const pct=(limit>0)?Math.round((owed/limit)*100):0; // safe: no division by zero
   return{owed,limit,pct,hasLimit:limit>0};
 }
-function renderAccountCards(){const html=ACCTS.map(a=>{const bal=calcBalance(a.key),start=memAccounts[a.key]||0;let utilHtml='';if(a.key==='creditCard'){const u=creditUtilPct();const col=!u.hasLimit?'var(--text-faint)':u.pct>=100?'#E24B4A':u.pct>=80?'#EF9F27':'#0E5C46';const rightLabel=u.hasLimit?`${fmtCad(u.owed)} / ${fmtCad(u.limit)}`:'Set a limit in Settings';utilHtml=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)"><div style="display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:${col}"><span>${u.pct}% of the limit</span><span>${rightLabel}</span></div><div class="budget-bar-wrap" style="height:5px;margin-top:4px"><div class="budget-bar" style="width:${Math.min(100,u.pct)}%;background:${col}"></div></div></div>`;}return `<div class="acct-card" style="background:${a.bg};border-color:${a.color}45" onclick="openBalModal('${a.key}')"><div style="font-size:9px;color:${a.color};font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">${a.icon} ${a.label}</div><div style="font-size:18px;font-weight:700;color:${bal<0?'#E24B4A':a.color}">${fmtCad(bal)}</div><div style="font-size:10px;color:#aaa;margin-top:2px">${fmtSecondary(bal)}</div><div style="font-size:10px;color:${a.color};opacity:.65;margin-top:5px">Start: ${fmtCad(start)}</div>${utilHtml}</div>`;}).join('');['account-cards','account-cards-transfers'].forEach(id=>{const g=document.getElementById(id);if(g)g.innerHTML=html;});}
-function openBalModal(k){editingBalKey=k;const a=ACCTS.find(x=>x.key===k);document.getElementById('bal-modal-title').textContent=a.icon+' '+a.label;const cur=settings.displayCurrency||'CAD';const stored=memAccounts[k]||0;const disp=fromCAD(stored,cur);document.getElementById('bal-input').value=stored?(cur==='INR'?Math.round(disp):+disp.toFixed(2)):'';const bc=document.getElementById('bal-currency');if(bc)bc.value=cur;document.getElementById('bal-modal').style.display='flex';setTimeout(()=>document.getElementById('bal-input').focus(),100);}
+function renderAccountCards(){const html=ACCTS.map(a=>{const bal=calcBalance(a.key),start=memAccounts[a.key]||0;const startLabel=a.key==='creditCard'?'Already owed at start':'Start';let utilHtml='';if(a.key==='creditCard'){const u=creditUtilPct();const col=!u.hasLimit?'var(--text-faint)':u.pct>=100?'#E24B4A':u.pct>=80?'#EF9F27':'#0E5C46';const rightLabel=u.hasLimit?`${fmtCad(u.owed)} / ${fmtCad(u.limit)}`:'Set a limit in Settings';utilHtml=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)"><div style="display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:${col}"><span>${u.pct}% of the limit</span><span>${rightLabel}</span></div><div class="budget-bar-wrap" style="height:5px;margin-top:4px"><div class="budget-bar" style="width:${Math.min(100,u.pct)}%;background:${col}"></div></div></div>`;}return `<div class="acct-card" style="background:${a.bg};border-color:${a.color}45" onclick="openBalModal('${a.key}')"><div style="font-size:9px;color:${a.color};font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">${a.icon} ${a.label}</div><div style="font-size:18px;font-weight:700;color:${bal<0?'#E24B4A':a.color}">${fmtCad(bal)}</div><div style="font-size:10px;color:#aaa;margin-top:2px">${fmtSecondary(bal)}</div><div style="font-size:10px;color:${a.color};opacity:.65;margin-top:5px">${startLabel}: ${fmtCad(start)}</div>${utilHtml}</div>`;}).join('');['account-cards','account-cards-transfers'].forEach(id=>{const g=document.getElementById(id);if(g)g.innerHTML=html;});}
+function openBalModal(k){editingBalKey=k;const a=ACCTS.find(x=>x.key===k);document.getElementById('bal-modal-title').textContent=a.icon+' '+a.label;const cur=settings.displayCurrency||'CAD';const stored=memAccounts[k]||0;const disp=fromCAD(stored,cur);document.getElementById('bal-input').value=stored?(cur==='INR'?Math.round(disp):+disp.toFixed(2)):'';const bc=document.getElementById('bal-currency');if(bc)bc.value=cur;
+  // Credit Card gets its own label/help text since a positive number here means
+  // "debt you already owed", NOT money available — the opposite of every other account.
+  const lbl=document.getElementById('bal-modal-label'),help=document.getElementById('bal-modal-help');
+  if(k==='creditCard'){lbl.textContent='Already Owed';help.innerHTML='If you already owe money on this card, enter that amount here — it counts <strong>against</strong> your Credit Limit. Leave it at 0 if you\'re starting fresh; new charges are tracked automatically as you add expenses.';}
+  else{lbl.textContent='Starting Balance';help.innerHTML='Set the amount already in this account <strong>before</strong> tracking started. Transactions update it automatically.';}
+  document.getElementById('bal-modal').style.display='flex';setTimeout(()=>document.getElementById('bal-input').focus(),100);}
 function saveStartingBal(){const cur=document.getElementById('bal-currency')?.value||'CAD';const val=parseFloat(document.getElementById('bal-input').value)||0;memAccounts[editingBalKey]=toCAD(val,cur);saveAll();renderAccountCards();document.getElementById('bal-modal').style.display='none';}
 
 // ── CREDIT LIMIT ──────────────────────────────────────────────────────────
