@@ -74,6 +74,8 @@ body{font-family:'Trebuchet MS',Arial,sans-serif}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 label.lbl{display:block;font-size:11px;color:var(--text-sub);font-weight:700;margin-bottom:5px}
 select,input[type=text],input[type=number],input[type=date]{width:100%;font-size:16px;padding:11px 12px;border:1.5px solid var(--border-col);border-radius:8px;font-family:'Trebuchet MS',Arial;transition:border-color .2s;color:var(--text-main);background:var(--input-bg);-webkit-appearance:none;appearance:none;touch-action:manipulation}
+.emoji-inline-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:6px;border-radius:6px;min-width:34px;min-height:34px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.emoji-inline-btn:active{background:var(--border-col)}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px rgba(14,92,70,.1)}
 
@@ -396,7 +398,7 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
     <h3>🏆 New Savings Goal</h3>
     <p style="font-size:12px;color:var(--text-sub);margin-bottom:12px">Set a target and a date, then chip away at it whenever you can.</p>
     <div class="form-row">
-      <div><label class="lbl">Goal Name</label><input type="text" id="goal-name" placeholder="e.g. Emergency Fund"></div>
+      <div><label class="lbl">Goal Name</label><div style="position:relative"><input type="text" id="goal-name" placeholder="e.g. Emergency Fund" style="padding-right:42px"><button type="button" class="emoji-inline-btn" onclick="openEmojiPicker('goal-name','insert')" title="Add emoji">🙂</button></div></div>
       <div><label class="lbl">Target Date</label><input type="date" id="goal-date"></div>
     </div>
     <div class="form-row">
@@ -430,7 +432,7 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
     </div>
     <div class="form-row">
       <div><label class="lbl">Date</label><input type="date" id="inc-date"></div>
-      <div><label class="lbl">Note (optional)</label><input type="text" id="inc-note" placeholder="e.g. Pay Cheque"></div>
+      <div><label class="lbl">Note (optional)</label><div style="position:relative"><input type="text" id="inc-note" placeholder="e.g. Pay Cheque" style="padding-right:42px"><button type="button" class="emoji-inline-btn" onclick="openEmojiPicker('inc-note','insert')" title="Add emoji">🙂</button></div></div>
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-income" id="inc-submit-btn" onclick="addIncome()" style="flex:1">➕ Add Income</button>
@@ -460,7 +462,7 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
     </div>
     <div class="form-row">
       <div><label class="lbl">Date</label><input type="date" id="exp-date"></div>
-      <div><label class="lbl">Note (optional)</label><input type="text" id="exp-note" placeholder="e.g. No Frills, Walmart"></div>
+      <div><label class="lbl">Note (optional)</label><div style="position:relative"><input type="text" id="exp-note" placeholder="e.g. No Frills, Walmart" style="padding-right:42px"><button type="button" class="emoji-inline-btn" onclick="openEmojiPicker('exp-note','insert')" title="Add emoji">🙂</button></div></div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1.5px solid var(--border-col);border-radius:8px;padding:10px 12px;margin-bottom:10px">
       <button class="toggle off" id="exp-split-toggle" onclick="toggleExpSplit()" style="flex-shrink:0"></button>
@@ -630,7 +632,7 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
       <div id="preset-list" style="margin-bottom:12px"></div>
       <div class="form-row">
         <div><label class="lbl">Label</label><input type="text" id="preset-label" placeholder="e.g. Coffee"></div>
-        <div><label class="lbl">Icon (emoji)</label><input type="text" id="preset-icon" placeholder="☕" maxlength="4"></div>
+        <div><label class="lbl">Icon (emoji)</label><input type="text" id="preset-icon" placeholder="Tap to choose 🙂" maxlength="4" readonly style="cursor:pointer;text-align:center;font-size:18px" onclick="openEmojiPicker('preset-icon')"></div>
       </div>
       <div class="form-row">
         <div><label class="lbl">Amount</label><input type="number" id="preset-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div>
@@ -684,6 +686,17 @@ select:focus,input:focus{outline:none;border-color:#0E5C46;box-shadow:0 0 0 3px 
   </div>
 </div>
 
+<div id="emoji-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeEmojiPicker()">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:15px;font-weight:700;color:#163C2E">Choose an Emoji</span>
+      <button class="btn-sm" onclick="closeEmojiPicker()" style="min-width:40px;min-height:40px">✕</button>
+    </div>
+    <div id="emoji-cat-tabs" style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px;-webkit-overflow-scrolling:touch"></div>
+    <div id="emoji-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:2px"></div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 // ── VIEWPORT ──────────────────────────────────────────────────────────────
@@ -729,6 +742,57 @@ const PAY_L={chequing:'🏦 Chequing',savings:'💰 Savings',creditCard:'💳 Cr
 const PAY_C={chequing:'#378ADD',savings:'#2E9C6E',creditCard:'#D85A30',cash:'#EF9F27',pending:'#4FB0C6'};
 const PAY_BG={chequing:'#EFF6FF',savings:'#EEFAF3',creditCard:'#FFF5F1',cash:'#FFFBF0',pending:'#EFFAFB'};
 const CAT_MIG={'🧴 Personal supplies':'🏠 Personal/Home Supplies','🏡 Home supplies':'🏠 Personal/Home Supplies','🍽️ Restaurant':'🍽️ Restaurant & Entertainment','🎉 Entertainment':'🍽️ Restaurant & Entertainment'};
+const EMOJI_CATS=[
+  ['😀','Smileys',['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😋','😛','😜','🤪','🤩','😎','🥳','😏','🙁','😢','😭','😤','😡','🤬','🥺','😳','🥵','🥶','😱','😨','😰','🤗','🤔','🤫','🤭','🙄','😴','🤢','🤮','🤒','🤕','😷','🥴','🤠','😈','👻','💀','👽','🤖','🎃']],
+  ['💰','Money',['💰','💵','💴','💶','💷','🪙','💳','💸','🏦','📈','📉','📊','🧾','💹','🤑','💲','🏧','💱']],
+  ['🍔','Food & Drink',['🍕','🍔','🍟','🌭','🥪','🌮','🌯','🥗','🍜','🍝','🍣','🍱','🍛','🍲','🥘','🍤','🍗','🍖','🥩','🥓','🍳','🧀','🥐','🍞','🥖','🥨','🧇','🥞','🍩','🍪','🎂','🍰','🧁','🍫','🍬','🍭','🍮','🍯','🍎','🍌','🍇','🍓','🍒','🍑','🍍','🥝','🍉','🍊','🥑','🍆','🥦','🥕','🌽','🥔','☕','🍵','🧃','🥤','🧋','🍺','🍻','🍷','🍸','🍹','🍾','🥂','🥃']],
+  ['🛍️','Shopping',['🛒','🛍️','👗','👕','👖','👟','👠','👜','💄','💍','👓','🧢','👒','🎒','🧥','🧦','👔','💼']],
+  ['🚗','Transport',['🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🛵','🏍️','🚲','🛴','🚡','🚠','🚟','🚃','🚞','🚋','🚄','🚅','🚈','🚂','🚆','🚇','🚊','🚉','✈️','🛫','🛬','🚀','🚁','⛵','🛥️','🚤','⛴️','🚢','⛽','🅿️','🚦','🚧','⚓']],
+  ['🏠','Home',['🏠','🏡','🏢','🏬','🏭','🏥','🏫','🏨','🛏️','🛋️','🚪','🪟','🪑','🚽','🛁','🚿','🧴','🧻','🧹','🧺','🧼','🪣','🔑','🔒','🔦','🕯️','💡','🧯']],
+  ['💊','Health',['💊','💉','🩹','🩺','🦷','🦴','🧬','🫀','🫁','🧠']],
+  ['💻','Tech & Bills',['📱','💻','🖥️','⌨️','🖱️','🖨️','📞','☎️','📠','📺','📻','🔌','🔋','📡','📶','🛰️','⌚']],
+  ['🎬','Entertainment',['🎬','🎮','🎲','🎯','🎳','🎰','🎨','🎭','🎤','🎧','🎼','🎹','🎸','🎻','🥁','📷','📸','🎥','🎟️','🎫','🎪','🎡','🎢','🎠']],
+  ['⚽','Sports',['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸','🥊','🥋','⛳','🏋️','🤸','🏄','🏊','🚴','🏃','🧘','⛷️','🏂','🎣','🏹']],
+  ['📚','Education',['📚','📖','📝','✏️','🖊️','🖋️','✒️','🖍️','📓','📔','📒','📕','📗','📘','📙','📰','🎓','🏫','🔬','🔭','🧮']],
+  ['🐶','Animals',['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦆','🦉','🐺','🐴','🦄','🐝','🦋','🐢','🐍','🐙','🐠','🐟','🐬','🐳']],
+  ['🌸','Nature',['🌸','🌹','🌻','🌼','🌷','🌱','🌲','🌳','🌴','🌵','🌾','☘️','🍀','🍁','🍂','🍃','🌍','🌙','⭐','✨','☀️','⛅','☁️','🌧️','⛈️','❄️','☃️','🌈','☂️','💧','🔥']],
+  ['👨','People',['👨','👩','🧑','👶','👴','👵','👫','💑','💏','🧑\u200d🤝\u200d🧑']],
+  ['🎁','Objects',['🎁','🎉','🎊','🎈','🎀','🔔','📌','📍','✂️','🗑️','📦','✉️','📅','⏰','🔍']],
+  ['❤️','Symbols',['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💯','✅','❌','⚠️','🔴','🟠','🟡','🟢','🔵','🟣']],
+  ['🏳️','Flags',['🇨🇦','🇺🇸','🇮🇳','🇬🇧','🇦🇺','🇳🇿','🇮🇪','🇫🇷','🇩🇪','🇮🇹','🇪🇸','🇵🇹','🇳🇱','🇧🇪','🇨🇭','🇸🇪','🇳🇴','🇩🇰','🇫🇮','🇵🇱','🇬🇷','🇦🇹','🇯🇵','🇨🇳','🇰🇷','🇭🇰','🇸🇬','🇦🇪','🇸🇦','🇮🇱','🇹🇷','🇷🇺','🇧🇷','🇲🇽','🇦🇷','🇿🇦','🇳🇬','🇵🇭','🇵🇰','🇧🇩','🇻🇳','🇹🇭','🇮🇩','🇲🇾','🏳️','🏴','🏁','🚩','🏳️‍🌈']]
+];
+let emojiPickerTarget=null, emojiActiveCat=0, emojiPickerMode='replace', emojiInsertPos=null;
+function openEmojiPicker(targetId,mode='replace'){
+  emojiPickerTarget=targetId;emojiPickerMode=mode;
+  const el=document.getElementById(targetId);
+  emojiInsertPos=(mode==='insert'&&el)?(el.selectionStart!=null?el.selectionStart:el.value.length):null;
+  renderEmojiPicker();document.getElementById('emoji-modal').style.display='flex';
+}
+function closeEmojiPicker(){document.getElementById('emoji-modal').style.display='none';}
+function selectEmoji(e){
+  if(emojiPickerTarget){
+    const el=document.getElementById(emojiPickerTarget);
+    if(el){
+      if(emojiPickerMode==='insert'){
+        const pos=emojiInsertPos!=null?emojiInsertPos:el.value.length;
+        el.value=el.value.slice(0,pos)+e+el.value.slice(pos);
+        el.focus();
+        const newPos=pos+e.length;
+        if(el.setSelectionRange)el.setSelectionRange(newPos,newPos);
+      }else{
+        el.value=e;
+      }
+    }
+  }
+  closeEmojiPicker();
+}
+function setEmojiCat(i){emojiActiveCat=i;renderEmojiPicker();}
+function renderEmojiPicker(){
+  const tabs=document.getElementById('emoji-cat-tabs');
+  tabs.innerHTML=EMOJI_CATS.map((c,i)=>`<button type="button" class="btn-sm${i===emojiActiveCat?' seg-active':''}" style="flex-shrink:0;font-size:17px;min-width:42px;padding:6px 9px${i===emojiActiveCat?';background:#0E5C46;border-color:#0E5C46':''}" title="${c[1]}" onclick="setEmojiCat(${i})">${c[0]}</button>`).join('');
+  const grid=document.getElementById('emoji-grid');
+  grid.innerHTML=EMOJI_CATS[emojiActiveCat][2].map(e=>`<button type="button" onclick="selectEmoji('${e}')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;min-height:42px">${e}</button>`).join('');
+}
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let INR_RATE=61.5, USD_RATE=0.73, USD_INR=84.0, rateTs='';
@@ -899,7 +963,20 @@ function saveCreditLimit(){
   saveAll();
   const msg=document.getElementById('credit-limit-msg');
   if(msg){msg.style.color='#0E5C46';msg.textContent='✅ Credit limit saved!';setTimeout(()=>{if(msg)msg.textContent='';},2500);}
-  renderAccountCards();updateBadge();
+  // ── FIX (Issue 1 – Data Sync Bug) ──────────────────────────────────────
+  // Old code only called renderAccountCards(), which recomputes
+  // creditUtilPct() = owed / settings.creditLimit against ALL existing
+  // credit-card transactions — so the math itself was never wrong, it just
+  // wasn't wired into the rest of the Dashboard (the "Budget %" metric and
+  // "Safe to Spend" banner live inside renderDashboard(), not inside
+  // renderAccountCards()). Swapping in renderDashboard() here recalculates
+  // and re-renders EVERYTHING that depends on settings.creditLimit in one
+  // pass (it calls renderAccountCards() internally too), so:
+  //   - Available Credit = Credit Limit - Total Owed on the card
+  //   - Utilization % = (Total Owed / Credit Limit) * 100
+  // reflect existing transaction history immediately, no refresh needed.
+  renderDashboard();
+  updateBadge();
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
@@ -955,7 +1032,17 @@ function renderDashboard(){
   const all=[...inc.map(e=>({...e,_t:'i'})),...exps.map(e=>({...e,_t:'e'}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
   const rl=document.getElementById('recent-list');
   if(!all.length){rl.innerHTML='<div class="empty">No activity yet</div>';return;}
-  rl.innerHTML=all.map(e=>{const isI=e._t==='i';const k=isI?(e.receivedIn||'chequing'):(e.payMethod||'cash');return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E;font-size:13px">${isI?e.source:e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[k]};color:${PAY_C[k]}">${PAY_L[k]}</span></span><span style="font-weight:700;color:${isI?'#0E5C46':'#D85A30'};white-space:nowrap">${isI?'+':'-'}${dispAmtConv(e)}</span></li>`;}).join('');
+  rl.innerHTML=all.map(e=>{
+    const isI=e._t==='i';
+    const k=isI?(e.receivedIn||'chequing'):(e.payMethod||'cash');
+    // ── FIX (Issue 2 – Notes & Emojis Omission) ─────────────────────────
+    // The Dashboard's "Recent Activity" feed pulls straight from the same
+    // income/expense records as the dedicated list tabs, so it inherited
+    // the same missing-emoji gap for Quick-Add transactions. Same
+    // icon-prefix treatment applied here for parity.
+    const iconPrefix=e.icon?`${e.icon} `:'';
+    return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E;font-size:13px">${iconPrefix}${isI?e.source:e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[k]};color:${PAY_C[k]}">${PAY_L[k]}</span></span><span style="font-weight:700;color:${isI?'#0E5C46':'#D85A30'};white-space:nowrap">${isI?'+':'-'}${dispAmtConv(e)}</span></li>`;
+  }).join('');
   updateBadge();
 }
 
@@ -1000,7 +1087,11 @@ async function addIncome(){
   document.getElementById('inc-amount').value='';document.getElementById('inc-note').value='';
   document.getElementById('inc-currency').value=settings.displayCurrency||'CAD';
   msg.style.color='#0E5C46';msg.textContent='✅ Added — balances updated!';setTimeout(()=>msg.textContent='',2500);
-  renderIncomeList();renderAccountCards();updateBadge();
+  // ── FIX (Issue 1 – Data Sync Bug) ────────────────────────────────────
+  // Same gap as addExpense(): new income affects "Safe to Spend"
+  // (Income - Budget) and the Balance/Income metrics on the Dashboard,
+  // but renderDashboard() was never invoked on this path.
+  renderIncomeList();renderAccountCards();renderDashboard();updateBadge();
 }
 function editIncome(id){
   const inc=allInc().find(e=>e.id===id);if(!inc)return;
@@ -1026,7 +1117,26 @@ function cancelEditIncome(){
   document.getElementById('inc-cancel-btn').style.display='none';
 }
 async function removeIncome(id){if(editingIncId===id)cancelEditIncome();await setInc(getInc().filter(e=>e.id!==id));renderIncomeList();renderAccountCards();renderDashboard();}
-function renderIncomeList(){const inc=[...getInc()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('income-list');if(!el)return;if(!inc.length){el.innerHTML='<div class="empty">No income recorded yet</div>';return;}el.innerHTML=inc.map(e=>{let split='';if(e.splitLinked){split=e.splitSettled?`<div style="font-weight:700;color:#0E5C46;font-size:11.5px;margin-top:3px">✅ Received from ${e.splitPerson}</div>`:`<div style="margin-top:3px"><span class="pending-pill">⏳ Pending</span> <span style="font-weight:700;color:#BA7517;font-size:11.5px">from ${e.splitPerson}</span></div>`;}const settleChk=(e.splitLinked&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('inc',${e.id})" title="Mark received">`:'';const amtCol=(e.splitLinked&&!e.splitSettled)?'#BA7517':'#0E5C46';return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E">${e.source}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span>${e.splitLinked?'':`<span class="pay-badge" style="background:${PAY_BG[e.receivedIn||'chequing']};color:${PAY_C[e.receivedIn||'chequing']}">${PAY_L[e.receivedIn||'chequing']}</span>`}${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:${amtCol}">+${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editIncome(${e.id})" style="min-width:38px;min-height:38px">✏️</button><button class="btn-sm" onclick="removeIncome(${e.id})" style="min-width:38px;min-height:38px">🗑</button></span></li>`;}).join('');}
+function renderIncomeList(){
+  const inc=[...getInc()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('income-list');
+  if(!el)return;
+  if(!inc.length){el.innerHTML='<div class="empty">No income recorded yet</div>';return;}
+  el.innerHTML=inc.map(e=>{
+    let split='';
+    if(e.splitLinked){split=e.splitSettled?`<div style="font-weight:700;color:#0E5C46;font-size:11.5px;margin-top:3px">✅ Received from ${e.splitPerson}</div>`:`<div style="margin-top:3px"><span class="pending-pill">⏳ Pending</span> <span style="font-weight:700;color:#BA7517;font-size:11.5px">from ${e.splitPerson}</span></div>`;}
+    const settleChk=(e.splitLinked&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('inc',${e.id})" title="Mark received">`:'';
+    const amtCol=(e.splitLinked&&!e.splitSettled)?'#BA7517':'#0E5C46';
+    // ── FIX (Issue 2 – Notes & Emojis Omission) ─────────────────────────
+    // Mirrors the expense-list fix: if an income entry ever carries an
+    // icon/emoji field (e.g. a future income preset), render it next to
+    // the source instead of dropping it. Safe no-op today since no income
+    // entry currently sets e.icon, but keeps this renderer consistent
+    // with renderExpenseList()/renderDashboard() per the shared schema.
+    const iconPrefix=e.icon?`${e.icon} `:'';
+    return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E">${iconPrefix}${e.source}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span>${e.splitLinked?'':`<span class="pay-badge" style="background:${PAY_BG[e.receivedIn||'chequing']};color:${PAY_C[e.receivedIn||'chequing']}">${PAY_L[e.receivedIn||'chequing']}</span>`}${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:${amtCol}">+${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editIncome(${e.id})" style="min-width:38px;min-height:38px">✏️</button><button class="btn-sm" onclick="removeIncome(${e.id})" style="min-width:38px;min-height:38px">🗑</button></span></li>`;
+  }).join('');
+}
 
 // ── TRANSFERS ─────────────────────────────────────────────────────────────
 function addTransfer(){
@@ -1368,6 +1478,12 @@ async function addExpense(){
     const arr=getExp();
     const updated={amount:amt,currency:cur,cat,date:dt,note,payMethod:(old&&old.splitDir==='i_owe')?'pending':pay,id:editingExpId};
     if(old&&old.splitPerson){updated.splitPerson=old.splitPerson;updated.splitDir=old.splitDir;if('splitSettled' in old)updated.splitSettled=old.splitSettled;}
+    // ── FIX (Issue 2 – Notes & Emojis Omission) ──────────────────────────
+    // If the original transaction carried an icon/emoji (e.g. it was
+    // created from a Quick-Add preset), the edit form has no icon input,
+    // so it must be explicitly carried over here or it silently vanishes
+    // the moment the entry is edited and re-saved.
+    if(old&&old.icon)updated.icon=old.icon;
     arr.push(updated);
     await setExp(arr);
     cancelEditExpense();
@@ -1419,7 +1535,15 @@ async function addExpense(){
   else if(wasSplit){msg.style.color='#0E5C46';msg.textContent=wasSplitDir==='owe_me'?`✅ Expense added — ${splitPerson} now owes you ${fmtCad(toCAD(splitAmt,cur))} (pending until received).`:`✅ Expense added — you owe ${splitPerson} for this one.`;}
   else{msg.style.color='#0E5C46';msg.textContent=wasRecur?'✅ Added — future occurrences will be added automatically!':'✅ Expense added — balances updated!';}
   setTimeout(()=>msg.textContent='',3500);
-  renderExpenseList();renderIncomeList();renderAccountCards();renderRecurringList();updateBadge();renderSplitsBanner();
+  // ── FIX (Issue 1 – Data Sync Bug) ────────────────────────────────────
+  // A freshly-added expense changes total spend for the active period,
+  // which should immediately move the Dashboard's "Spent"/"Balance"/
+  // "Budget %" metrics and per-category progress bars — but renderDashboard()
+  // was never called on this path, so those stayed frozen until a tab
+  // switch. Added here so the Dashboard reflects new transactions the
+  // instant they're saved, same as the recalculation added to
+  // saveBudgets()/saveCreditLimit().
+  renderExpenseList();renderIncomeList();renderAccountCards();renderRecurringList();renderDashboard();updateBadge();renderSplitsBanner();
 }
 function editExpense(id){
   const exp=allExp().find(e=>e.id===id);if(!exp)return;
@@ -1447,7 +1571,24 @@ function cancelEditExpense(){
   document.getElementById('exp-cancel-btn').style.display='none';
 }
 async function removeExpense(id){if(editingExpId===id)cancelEditExpense();await setExp(getExp().filter(e=>e.id!==id));renderExpenseList();renderAccountCards();renderDashboard();}
-function renderExpenseList(){const exps=[...getExp()].sort((a,b)=>new Date(b.date)-new Date(a.date));const el=document.getElementById('all-list');if(!exps.length){el.innerHTML='<div class="empty">No expenses recorded yet</div>';return;}el.innerHTML=exps.map(e=>{const pm=e.payMethod||'cash';let split='';if(e.splitDir==='i_owe'){split=e.splitSettled?`<div style="font-weight:700;color:#0E5C46;font-size:11.5px;margin-top:3px">✅ Repaid ${e.splitPerson}</div>`:`<div style="font-weight:800;color:#D85A30;font-size:12.5px;margin-top:3px">You owe ${e.splitPerson} ${fmtCad(toCAD(e.amount,e.currency))}</div>`;}const settleChk=(e.splitDir==='i_owe'&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('exp',${e.id})" title="Mark repaid">`:'';return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E">${e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[pm]};color:${PAY_C[pm]};width:fit-content">${PAY_L[pm]}</span>${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:#D85A30">-${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editExpense(${e.id})" style="min-height:38px;min-width:38px">✏️</button><button class="btn-sm" onclick="removeExpense(${e.id})" style="min-height:38px;min-width:38px">🗑</button></span></li>`;}).join('');}
+function renderExpenseList(){
+  const exps=[...getExp()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('all-list');
+  if(!exps.length){el.innerHTML='<div class="empty">No expenses recorded yet</div>';return;}
+  el.innerHTML=exps.map(e=>{
+    const pm=e.payMethod||'cash';
+    let split='';
+    if(e.splitDir==='i_owe'){split=e.splitSettled?`<div style="font-weight:700;color:#0E5C46;font-size:11.5px;margin-top:3px">✅ Repaid ${e.splitPerson}</div>`:`<div style="font-weight:800;color:#D85A30;font-size:12.5px;margin-top:3px">You owe ${e.splitPerson} ${fmtCad(toCAD(e.amount,e.currency))}</div>`;}
+    const settleChk=(e.splitDir==='i_owe'&&!e.splitSettled)?`<input type="checkbox" class="split-chk" onclick="settleSplitItem('exp',${e.id})" title="Mark repaid">`:'';
+    // ── FIX (Issue 2 – Notes & Emojis Omission) ─────────────────────────
+    // e.icon (set by quickAddExpense, carried through edits) is now
+    // prefixed onto the category label instead of being ignored.
+    // e.note was already being read here previously — it wasn't actually
+    // broken on this line; the emoji was the missing piece.
+    const iconPrefix=e.icon?`${e.icon} `:'';
+    return `<li class="list-item"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;color:#163C2E">${iconPrefix}${e.cat}</span><span style="font-size:10px;color:#aaa">${e.note||''} · ${e.date}</span><span class="pay-badge" style="background:${PAY_BG[pm]};color:${PAY_C[pm]};width:fit-content">${PAY_L[pm]}</span>${split}</span><span style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-weight:700;color:#D85A30">-${dispAmtConv(e)}</span>${settleChk}<button class="btn-sm" onclick="editExpense(${e.id})" style="min-height:38px;min-width:38px">✏️</button><button class="btn-sm" onclick="removeExpense(${e.id})" style="min-height:38px;min-width:38px">🗑</button></span></li>`;
+  }).join('');
+}
 
 // ── QUICK-ADD PRESETS ────────────────────────────────────────────────────
 function renderQuickAdd(){
@@ -1460,7 +1601,15 @@ async function quickAddExpense(id){
   const d=new Date();viewYear=d.getFullYear();viewMonth=d.getMonth();
   const dt=localDateStr(d);
   const exps=getExp();
-  exps.push({amount:p.amount,currency:p.currency,cat:p.cat,date:dt,note:'Quick add: '+p.label,payMethod:p.payMethod,id:Date.now()});
+  // ── FIX (Issue 2 – Notes & Emojis Omission) ────────────────────────────
+  // The preset object (p) carries its own emoji in p.icon, chosen via the
+  // emoji picker when the preset was created. The old code copied over the
+  // note ('Quick add: '+p.label) but silently dropped p.icon, so every
+  // transaction logged via a Quick-Add button lost its emoji forever —
+  // it only ever showed up on the Quick-Add button itself, never on the
+  // resulting transaction record. Adding icon:p.icon here preserves it on
+  // the transaction object so the list renderers below can display it.
+  exps.push({amount:p.amount,currency:p.currency,cat:p.cat,date:dt,note:'Quick add: '+p.label,payMethod:p.payMethod,icon:p.icon||'',id:Date.now()});
   await setExp(exps);
   renderExpenseList();renderAccountCards();renderDashboard();updateBadge();
   const msg=document.getElementById('exp-msg');
@@ -1620,7 +1769,29 @@ ${mkExpSection('chequing','🏦 Chequing Account','#378ADD')}${mkExpSection('sav
 }
 
 // ── BACKUP ────────────────────────────────────────────────────────────────
-function downloadBackup(){const allE={},allI={};Object.keys(memExp).forEach(k=>allE[k]=memExp[k]);Object.keys(memInc).forEach(k=>allI[k]=memInc[k]);const blob=new Blob([JSON.stringify({version:'7.1',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets,splits:memSplits},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LedgerFlow_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);renderDataSummary();}
+function downloadBackup(){
+  // ── FIX (Issue 3a – Backup Completeness) ───────────────────────────────
+  // The raw memExp/memInc objects already carried every field a
+  // transaction has (amount, currency, cat, date, note, id, payMethod,
+  // icon, splitPerson, etc.) since they were spread as-is — nothing was
+  // being silently stripped here. What WAS missing was an explicit,
+  // guaranteed set of the specific fields called out for backup
+  // integrity: note, emoji, category, amount, date, type, and id. This
+  // now normalizes every transaction on export so those seven fields are
+  // always present under predictable names (in addition to the original
+  // fields, kept for backward compatibility with existing renderers).
+  const allE={},allI={};
+  Object.keys(memExp).forEach(k=>{
+    allE[k]=memExp[k].map(e=>({...e,type:'expense',category:e.cat,note:e.note||'',emoji:e.icon||''}));
+  });
+  Object.keys(memInc).forEach(k=>{
+    allI[k]=memInc[k].map(e=>({...e,type:'income',category:e.source,note:e.note||'',emoji:e.icon||''}));
+  });
+  const blob=new Blob([JSON.stringify({version:'7.1',exportedAt:new Date().toISOString(),expenses:allE,income:allI,budgets:memBudgets,settings,accounts:memAccounts,transfers:memTransfers,recurring:memRecurring,goals:memGoals,presets:memPresets,splits:memSplits},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LedgerFlow_Backup_'+localDateStr()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  document.getElementById('backup-dl-msg').innerHTML='<span style="color:#217346">✅ Backup downloaded!</span>';setTimeout(()=>document.getElementById('backup-dl-msg').textContent='',5000);
+  renderDataSummary();
+}
 
 // ── CSV EXPORT ────────────────────────────────────────────────────────────
 function csvEsc(v){v=(v===undefined||v===null)?'':String(v);if(/[",\n]/.test(v))v='"'+v.replace(/"/g,'""')+'"';return v;}
@@ -1637,7 +1808,106 @@ function downloadCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LedgerFlow_'+localDateStr()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
   if(msg){msg.innerHTML='<span style="color:#0E5C46">✅ CSV exported!</span>';setTimeout(()=>{if(msg)msg.textContent='';},5000);}
 }
-function importBackup(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{try{const p=JSON.parse(e.target.result);if(!p.expenses)throw new Error();if(!confirm(`⚠️ Replace ALL data with backup from ${p.exportedAt?.split('T')[0]||'?'}?`))return;memExp=p.expenses||{};memInc=p.income||{};memBudgets=p.budgets||Object.fromEntries(CATS.map(c=>[c.name,0]));settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},p.settings||{});readAlerts=new Set(settings.readAlerts||[]);memAccounts=p.accounts||{chequing:0,savings:0,creditCard:0,cash:0};memTransfers=p.transfers||[];memRecurring=p.recurring||[];memGoals=p.goals||[];memPresets=p.presets||[];memSplits=p.splits||[];['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value=settings.displayCurrency||'CAD';});applyTheme();await saveAll();generateRecurringDue();renderDashboard();renderBudgetForm();renderDataSummary();renderRecurringList();renderGoalsList();renderQuickAdd();renderPresetSettings();renderCreditLimitForm();renderSplitsBanner();document.getElementById('backup-import-msg').innerHTML='<span style="color:#0E5C46">✅ Backup restored!</span>';setTimeout(()=>document.getElementById('backup-import-msg').textContent='',5000);}catch(_){document.getElementById('backup-import-msg').innerHTML='<span style="color:#E24B4A">❌ Invalid file.</span>';}};reader.readAsText(file);ev.target.value='';}
+// ── FIX (Issue 3b-ii – Restore Persistence) ────────────────────────────────
+// saveAll() only ever writes the CURRENTLY VIEWED month's expense/income
+// keys — it calls getExp()/getInc(), which resolve to memExp[eKey()] /
+// memInc[iKey()] for viewYear/viewMonth only. That's correct for normal
+// day-to-day add/edit/delete (which only ever touch the active month), but
+// a restored backup can drop MANY months into memExp/memInc at once.
+// Without this function, every month except whichever happened to be on
+// screen at import time would live in memory only and silently disappear
+// the next time the app reloads, since loadAll() would never find storage
+// keys for them. This writes every period actually present in memory.
+async function persistAllPeriods(){
+  let ok=true;
+  for(const k in memExp){
+    try{await window.storage.set('ledgerflow_'+k,JSON.stringify(memExp[k]));}catch(_){ok=false;}
+  }
+  for(const k in memInc){
+    try{await window.storage.set('ledgerflow_'+k,JSON.stringify(memInc[k]));}catch(_){ok=false;}
+  }
+  return ok;
+}
+// ── FIX (Issue 3b-ii – Full App Recalculation) ─────────────────────────────
+// LedgerFlow has no separate cached "totals" state to invalidate — every
+// figure (Budget %, Safe-to-Spend, Credit Utilization %, Available
+// Balance, account balances) is derived fresh on every call, straight from
+// memExp/memInc/memBudgets/settings.creditLimit, inside the render*()
+// functions. So "recalculating" means re-invoking every view that reads
+// that data, guaranteeing the whole app — not just the Dashboard — is
+// showing numbers based on the transaction history currently in memory.
+// This is exactly what a bulk operation like a backup restore needs.
+function recalculateAll(){
+  renderDashboard();       // metrics, budget bars, safe-to-spend, account cards, credit utilization %
+  renderBudgetForm();      // Budget tab inputs/total
+  renderCreditLimitForm(); // Credit Limit tab input/toggle
+  renderRecurringList();
+  renderGoalsList();
+  renderQuickAdd();
+  renderPresetSettings();
+  renderSplitsBanner();
+  renderDataSummary();     // Backup tab record/month/all-time totals
+  updateBadge();
+}
+function importBackup(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const p=JSON.parse(e.target.result);
+      if(!p.expenses)throw new Error();
+      if(!confirm(`⚠️ Replace ALL data with backup from ${p.exportedAt?.split('T')[0]||'?'}?`))return;
+
+      // ── FIX (Issue 3b-i – Restore Parsing) ────────────────────────────
+      // Import every field on each transaction exactly as stored — no
+      // destructuring/whitelisting that could drop unrecognized keys, so
+      // note, icon (emoji), splitPerson, recurringId, etc. all survive the
+      // round trip untouched. The only defensive step is guaranteeing
+      // `note` and `icon` exist as strings (a backup made before the emoji
+      // feature existed won't have `icon` at all) — never discarding them.
+      const normTxn=x=>({...x,note:x.note||'',icon:x.icon||''});
+      const normExp={};Object.keys(p.expenses||{}).forEach(k=>normExp[k]=(p.expenses[k]||[]).map(normTxn));
+      const normInc={};Object.keys(p.income||{}).forEach(k=>normInc[k]=(p.income[k]||[]).map(normTxn));
+      memExp=normExp;memInc=normInc;
+
+      memBudgets=p.budgets||Object.fromEntries(CATS.map(c=>[c.name,0]));
+      settings=Object.assign({over:true,warn:true,remain:true,creditAlertOn:true,creditLimit:0,theme:'system',displayCurrency:'CAD'},p.settings||{});
+      readAlerts=new Set(settings.readAlerts||[]);
+      memAccounts=p.accounts||{chequing:0,savings:0,creditCard:0,cash:0};
+      memTransfers=p.transfers||[];memRecurring=p.recurring||[];memGoals=p.goals||[];memPresets=p.presets||[];memSplits=p.splits||[];
+
+      ['over','warn','remain','creditAlertOn'].forEach(k=>{const b=document.getElementById('tog-'+k);if(b)b.className='toggle '+(settings[k]?'on':'off');});
+      const bc=document.getElementById('budget-currency');if(bc)bc.value=settings.displayCurrency||'CAD';
+      const dc=document.getElementById('display-currency-sel');if(dc)dc.value=settings.displayCurrency||'CAD';
+      ['exp-currency','inc-currency','trf-currency','goal-currency','preset-currency','credit-limit-currency'].forEach(id=>{const elx=document.getElementById(id);if(elx)elx.value=settings.displayCurrency||'CAD';});
+      applyTheme();
+
+      // ── FIX (Issue 3b-ii – Restore Persistence) ────────────────────────
+      // saveAll() handles the global keys (settings/budgets/accounts/
+      // transfers/recurring/goals/presets/splits) plus whichever single
+      // month is currently on screen; persistAllPeriods() then writes
+      // EVERY month of restored expense/income data so nothing from the
+      // backup is lost on next reload.
+      await saveAll();
+      await persistAllPeriods();
+      await generateRecurringDue();
+
+      // ── FIX (Issue 3b-ii – Full Recalculation & Re-render) ─────────────
+      // Explicitly requested: a full recalculation pass, then a Dashboard
+      // re-render, so Credit Limit %, Used %, and Available Balances are
+      // correct immediately based on the just-restored history.
+      recalculateAll();
+      renderDashboard();
+
+      document.getElementById('backup-import-msg').innerHTML='<span style="color:#0E5C46">✅ Backup restored!</span>';
+      setTimeout(()=>document.getElementById('backup-import-msg').textContent='',5000);
+    }catch(_){
+      document.getElementById('backup-import-msg').innerHTML='<span style="color:#E24B4A">❌ Invalid file.</span>';
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value='';
+}
 async function resetAllData(){
   if(!confirm('⚠️ This will permanently delete ALL saved data — every expense, income entry, budget, savings goal, account balance, transfer, recurring item, quick-add preset and setting.\n\nThis cannot be undone. Consider downloading a backup first (Backup tab).\n\nContinue?'))return;
   if(!confirm('Are you absolutely sure? This is the last step — all data will be wiped.'))return;
@@ -1700,7 +1970,24 @@ function saveBudgets(){
   });
   settings.budgetCurrency=cur;
   saveAll();
-  document.getElementById('budget-msg').textContent='✅ Budgets saved!';setTimeout(()=>document.getElementById('budget-msg').textContent='',2500);updateBadge();
+  document.getElementById('budget-msg').textContent='✅ Budgets saved!';setTimeout(()=>document.getElementById('budget-msg').textContent='',2500);
+  // ── FIX (Issue 1 – Data Sync Bug) ──────────────────────────────────────
+  // Previously this function only persisted memBudgets via saveAll() and
+  // updated the Budget-tab total. It never told the Dashboard to
+  // re-evaluate itself, so if expenses already existed for the active
+  // month, the "Budget %" metric, the per-category progress bars, and the
+  // "Safe to Spend" banner stayed on whatever value they last rendered
+  // (often 0%/frozen) until the user happened to navigate away from and
+  // back to the Dashboard tab (which is the only other place that calls
+  // renderDashboard()).
+  // renderDashboard() re-reads memBudgets + getExp()/getInc() for the
+  // CURRENT active period fresh on every call, so simply re-invoking it
+  // here forces an immediate, correct recalculation of:
+  //   - Remaining/Available = memBudgets total - total expenses in period
+  //   - Used % = (total expenses in period / memBudgets total) * 100
+  // and repaints the progress bar + percentage indicator instantly.
+  renderDashboard();
+  updateBadge();
 }
 
 // ── CONVERT ───────────────────────────────────────────────────────────────
