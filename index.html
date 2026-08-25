@@ -861,31 +861,43 @@ const CURRENCIES=[
   {code:'USD',flag:'🇺🇸',symbol:'$',name:'United States Dollar'},
 ];
 // FIX (Issue 11 – Add Major Currencies to Income/Expense/Convert; extended by
-// Issue 12 to Transfers + Settings ▸ Display Currency): these selects offer
-// the full set of major world currencies — Budgets, Goals, Balances, Credit
-// Limit, and Presets still use CURRENCIES (CAD/INR/USD) below, since those
-// weren't asked for. MAJOR_CURRENCIES is a superset of CURRENCIES used only
-// by the selects in MAJOR_SELECT_IDS further down.
+// Issue 12 to Transfers + Settings ▸ Display Currency; extended by Issue 14
+// to every remaining currency select — Budgets, Goals, Balances, Credit
+// Limit, Presets — for full consistency across the app). MAJOR_CURRENCIES is
+// now the one shared list every currency <select> in the app draws from; see
+// standardizeCurrencySelects() below. CURRENCIES is kept only as the
+// currencyOptionsHTML() default and is no longer used by any select directly.
+// FIX (Issue 15 – Alphabetical Currency Order): every currency <select> in
+// the app draws from this one array (see standardizeCurrencySelects() below),
+// so it's now kept in A→Z order by CODE — the part shown first in each
+// option ("🇦🇺 AUD - Australian Dollar" before "🇨🇦 CAD - ..."). Keep any
+// future additions in alphabetical order too, so the dropdowns stay sorted
+// everywhere without needing a separate sort step at render time.
 const MAJOR_CURRENCIES=[
+  {code:'AUD',flag:'🇦🇺',symbol:'A$',name:'Australian Dollar'},
   {code:'CAD',flag:'🇨🇦',symbol:'$',name:'Canadian Dollar'},
-  {code:'USD',flag:'🇺🇸',symbol:'$',name:'United States Dollar'},
+  {code:'CHF',flag:'🇨🇭',symbol:'Fr',name:'Swiss Franc'},
+  {code:'CNY',flag:'🇨🇳',symbol:'¥',name:'Chinese Yuan'},
   {code:'EUR',flag:'🇪🇺',symbol:'€',name:'Euro'},
   {code:'GBP',flag:'🇬🇧',symbol:'£',name:'British Pound'},
-  {code:'AUD',flag:'🇦🇺',symbol:'A$',name:'Australian Dollar'},
-  {code:'SGD',flag:'🇸🇬',symbol:'S$',name:'Singapore Dollar'},
   {code:'HKD',flag:'🇭🇰',symbol:'HK$',name:'Hong Kong Dollar'},
   {code:'INR',flag:'🇮🇳',symbol:'₹',name:'Indian Rupee'},
   {code:'JPY',flag:'🇯🇵',symbol:'¥',name:'Japanese Yen'},
-  {code:'CNY',flag:'🇨🇳',symbol:'¥',name:'Chinese Yuan'},
-  {code:'CHF',flag:'🇨🇭',symbol:'Fr',name:'Swiss Franc'},
   {code:'NZD',flag:'🇳🇿',symbol:'NZ$',name:'New Zealand Dollar'},
+  {code:'SGD',flag:'🇸🇬',symbol:'S$',name:'Singapore Dollar'},
+  {code:'USD',flag:'🇺🇸',symbol:'$',name:'United States Dollar'},
 ];
-// FIX (Issue 12 – Extend Major Currencies to Transfer Tab + Default/Display
-// Currency Setting): per follow-up request, the Transfer tab and the Settings
-// ▸ Display Currency dropdown now also get the full major-currency list — the
-// remaining selects (Budgets, Goals, Balances, Credit Limit, Presets) stay on
-// CURRENCIES (CAD/INR/USD), since those weren't asked for.
-const MAJOR_SELECT_IDS=new Set(['exp-currency','inc-currency','trf-currency','display-currency-sel']);
+// FIX (Issue 14 – Every Currency Select Now Consistent): per follow-up
+// request, EVERY currency dropdown in the app — Budgets, Goals, Balances,
+// Credit Limit, and Presets included — now offers the same full
+// major-currency list as Income/Expense/Transfer/Convert/Display Currency.
+// This also closes a real latent bug: several forms (the Balance modal, the
+// Credit Limit form) sync their own currency <select> to whatever
+// settings.displayCurrency is — once Display Currency could be set to EUR,
+// JPY, etc., that sync would silently fail on any select whose option list
+// didn't include that currency (setting .value to a non-existent <option> is
+// a no-op), leaving the label out of sync with the amount actually shown.
+// Making every select share MAJOR_CURRENCIES removes that mismatch entirely.
 const CURRENCY_SELECT_IDS=['exp-currency','inc-currency','trf-currency','budget-currency','goal-currency','goal-fund-currency','preset-currency','credit-limit-currency','bal-currency','display-currency-sel'];
 // FIX (Issue 13 – Spell Out Unfamiliar Currency Codes): options now read
 // "🇺🇸 USD - United States Dollar" instead of just "🇺🇸 USD $", since a code
@@ -895,9 +907,8 @@ function standardizeCurrencySelects(){
   CURRENCY_SELECT_IDS.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const val=el.value;
-    const list=MAJOR_SELECT_IDS.has(id)?MAJOR_CURRENCIES:CURRENCIES;
-    el.innerHTML=currencyOptionsHTML(list);
-    if(val&&list.some(c=>c.code===val))el.value=val;
+    el.innerHTML=currencyOptionsHTML(MAJOR_CURRENCIES);
+    if(val&&MAJOR_CURRENCIES.some(c=>c.code===val))el.value=val;
   });
   // Convert tab (From/To) also gets the full major-currency list — converting
   // between, say, EUR and SGD is exactly what this tab is for.
@@ -2312,7 +2323,11 @@ function downloadCSV(){
   // Amount (Display Currency) column now follows Settings ▸ Display Currency (was
   // always a hardcoded "Amount (CAD)" column regardless of what the user had chosen).
   const primCur=settings.displayCurrency||'CAD';
-  const dec=primCur==='INR'?0:2;
+  // FIX (Issue 14 – Every Currency Select Now Consistent): JPY is zero-decimal
+  // just like INR (see fmtMoney), and Display Currency can now be set to it —
+  // so this export column needs the same check, or a JPY export would show
+  // two decimal places on a currency that never has any.
+  const dec=(primCur==='INR'||primCur==='JPY')?0:2;
   const data=[];
   allInc().forEach(e=>data.push([e.date,'Income',e.source,e.amount,e.currency,fromCAD(toCAD(e.amount,e.currency),primCur).toFixed(dec),(PAY_L[e.receivedIn||'chequing']||'').replace(/^\S+\s/,''),e.note||'']));
   allExp().forEach(e=>data.push([e.date,'Expense',e.cat,e.amount,e.currency,fromCAD(toCAD(e.amount,e.currency),primCur).toFixed(dec),(PAY_L[e.payMethod||'cash']||'').replace(/^\S+\s/,''),e.note||'']));
@@ -2525,10 +2540,14 @@ function fromCAD(amt,to){if(to==='CAD')return amt;if(to==='INR')return amt*INR_R
 function renderBudgetForm(){
   const cur=document.getElementById('budget-currency')?.value||'CAD';
   const sym=currencySym(cur);
+  // FIX (Issue 14 – Every Currency Select Now Consistent): budget-currency can
+  // now be set to JPY too, so it needs the same zero-decimal treatment INR
+  // already gets here.
+  const zeroDec=cur==='INR'||cur==='JPY';
   document.getElementById('budget-form').innerHTML=CATS.map(c=>{
     const stored=memBudgets[c.name]||0;
     const disp=stored>0?fromCAD(stored,cur):0;
-    const dispVal=disp>0?(cur==='INR'?Math.round(disp):+disp.toFixed(2)):'';
+    const dispVal=disp>0?(zeroDec?Math.round(disp):+disp.toFixed(2)):'';
     return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><label style="font-size:13px;min-width:175px;color:#163C2E;font-weight:600">${c.name}</label><div style="position:relative;flex:1"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:#aaa;pointer-events:none">${sym}</span><input type="number" id="bgt-${c.name.replace(/[^a-z0-9]/gi,'_')}" value="${dispVal}" placeholder="Enter budget" min="0" inputmode="decimal" style="padding-left:40px" oninput="updateBudgetTotal()"></div></div>`;
   }).join('');
   updateBudgetTotal();
@@ -2542,7 +2561,9 @@ function updateBudgetTotal(){
     const inp=document.getElementById('bgt-'+c.name.replace(/[^a-z0-9]/gi,'_'));
     if(inp)total+=parseFloat(inp.value)||0;
   });
-  const dispTotal=cur==='INR'?Math.round(total).toLocaleString():total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  // FIX (Issue 14 – Every Currency Select Now Consistent): same JPY
+  // zero-decimal parity as renderBudgetForm above.
+  const dispTotal=(cur==='INR'||cur==='JPY')?Math.round(total).toLocaleString():total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
   el.innerHTML=`<span style="font-size:13px;font-weight:700;color:var(--text-main)">Total Budgeted</span><span style="font-size:17px;font-weight:700;color:#0E5C46">${sym}${dispTotal}</span>`;
 }
 function saveBudgets(){
